@@ -1,6 +1,7 @@
 package com.project.aura.Entity;
 
 import jakarta.persistence.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.management.relation.Role;
 
@@ -19,15 +20,11 @@ public class Users {
     private String userEmail;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
-
-    public enum Role{
-        PATIENT,
-        HOSPITAL_ADMIN,
-        SUPPLY_ADMIN
-    }
 
     public int getUserid() {
         return userid;
