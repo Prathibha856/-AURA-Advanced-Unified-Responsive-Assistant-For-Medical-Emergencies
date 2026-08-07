@@ -47,6 +47,8 @@ public class Users {
 //    SUPPLY_ADMIN = Position 2
 
 //    not only this, any enum will store in number respectively how we declared.
+//    By default, JPA saves enum fields into the database as integers
+//    corresponding to their ordinal index (0, 1, 2) rather than string names ("PATIENT", "HOSPITAL_ADMIN").
 
     @Override
     public String toString() {
