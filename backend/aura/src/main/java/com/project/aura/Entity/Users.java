@@ -39,46 +39,14 @@ public class Users {
         SUPPLY_ADMIN;
 
     }
+//    in DB, the enum roles will in numbers, not in actuall name
+//    Why is role showing as 0?
+//    In Java, an enum has an implicit position index (called an ordinal):
+//    PATIENT = Position 0
+//    HOSPITAL_ADMIN = Position 1
+//    SUPPLY_ADMIN = Position 2
 
-//    public int getUserid() {
-//        return userid;
-//    }
-//
-//    public void setUserid(int userid) {
-//        this.userid = userid;
-//    }
-//
-//    public String getUsername() {
-//        return username;
-//    }
-//
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
-//
-//    public String getUserEmail() {
-//        return userEmail;
-//    }
-//
-//    public void setUserEmail(String userEmail) {
-//        this.userEmail = userEmail;
-//    }
-//
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public void setPassword(String password) {
-//        this.password = password;
-//    }
-//
-//    public Role getRole() {
-//        return role;
-//    }
-//
-//    public void setRole(Role role) {
-//        this.role = role;
-//    }
+//    not only this, any enum will store in number respectively how we declared.
 
     @Override
     public String toString() {

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -16,9 +17,9 @@ public class RegisterService {
     private UserRepo userRepo;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private PasswordEncoder passwordEncoder;
 
-    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(3);
+//    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(3);
 
 
     public Users newRegister(RegisterRequest registerRequest) {
@@ -33,7 +34,7 @@ public class RegisterService {
 
         users.setUsername(registerRequest.getUsername());
         users.setUserEmail(registerRequest.getEmail());
-        users.setPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()));
+        users.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         users.setRole(registerRequest.getRole());
         return userRepo.save(users);
     }

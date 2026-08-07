@@ -17,6 +17,14 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class Config {
 
+    @Autowired
+    public UserDetailsService userDetailsService;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // default strength (10) — valid range is 4–31
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity){
         httpSecurity.csrf(customize -> customize.disable())
@@ -30,8 +38,7 @@ public class Config {
         return httpSecurity.build();
     }
 
-    @Autowired
-    public UserDetailsService userDetailsService;
+
 
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {
@@ -42,7 +49,7 @@ public class Config {
     public AuthenticationProvider authenticationProvider(){
 
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(3));
+        provider.setPasswordEncoder(passwordEncoder());
 //        provider.setUserDetailsService(userDetailsService);
         return provider;
     }
