@@ -5,7 +5,9 @@ import com.project.aura.Entity.Users;
 import com.project.aura.Repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.method.AuthorizeReturnObject;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,9 @@ public class RegisterService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
 
 //    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(3);
 
@@ -37,5 +42,16 @@ public class RegisterService {
         users.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         users.setRole(registerRequest.getRole());
         return userRepo.save(users);
+    }
+
+    public String verify(Users users) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(users.getUsername(), users.getPassword()));
+        if(authentication.isAuthenticated()){
+            return "success";
+        }else{
+            return "fail";
+        }
     }
 }

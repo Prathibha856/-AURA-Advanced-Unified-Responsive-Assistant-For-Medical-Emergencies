@@ -23,7 +23,8 @@ public class AuthController {
         return ResponseEntity.ok("User registered successfully with ID: " + saveUsers.getUserid());
     }
 
-
-
-//    @PostMapping("api/auth/login")
+    @PostMapping("/login")
+    public String login(@RequestBody Users users){
+        return registerService.verify(users);
+    }
 }
