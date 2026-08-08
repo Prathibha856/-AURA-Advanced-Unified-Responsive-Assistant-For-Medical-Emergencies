@@ -44,14 +44,14 @@ public class RegisterService {
         return userRepo.save(users);
     }
 
-    public String verify(Users users) {
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(users.getUsername(), users.getPassword()));
-        if(authentication.isAuthenticated()){
-            return "success";
-        }else{
-            return "fail";
-        }
-    }
+//    public String verify(Users users) {
+//
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(users.getUsername(), users.getPassword()));
+//        if(authentication.isAuthenticated()){
+//            return "success";
+//        }else{
+//            return "fail";
+//        }
+//    }
 }
