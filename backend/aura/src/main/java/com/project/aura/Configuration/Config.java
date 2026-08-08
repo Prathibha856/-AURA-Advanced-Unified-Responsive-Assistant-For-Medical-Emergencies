@@ -20,7 +20,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class Config {
 
     @Autowired
-    public UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
