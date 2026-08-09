@@ -3,6 +3,7 @@ package com.project.aura.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -23,5 +24,14 @@ public class JWTService {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+//    this is method being used in JwtFilter
+    public String extratUserName(String token) {
+        return "";
+    }
+
+    public boolean validataToken(String token, UserDetails userDetails) {
+        return true;
     }
 }
