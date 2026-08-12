@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.minidev.json.annotate.JsonIgnore;
+import org.hibernate.annotations.EmbeddedColumnNaming;
 
 import javax.management.relation.Role;
 
@@ -30,6 +31,10 @@ public class Users {
     @Column(nullable = false)
     @JsonIgnore
     private String password;
+
+    @Column(name = "user_phone_number")
+//    @EmbeddedColumnNaming
+    private String userPhoneNumber;
 
     private Role role;
 
@@ -57,6 +62,7 @@ public class Users {
                 ", username='" + username + '\'' +
                 ", userEmail='" + userEmail + '\'' +
                 ", password='" + password + '\'' +
+                ", userPhoneNumber=" + userPhoneNumber +
                 ", role=" + role +
                 '}';
     }
