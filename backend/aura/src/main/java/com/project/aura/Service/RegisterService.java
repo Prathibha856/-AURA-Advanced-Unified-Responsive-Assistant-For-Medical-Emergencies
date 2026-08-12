@@ -40,6 +40,7 @@ public class RegisterService {
         users.setUsername(registerRequest.getUsername());
         users.setUserEmail(registerRequest.getEmail());
         users.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        users.setUserPhoneNumber(registerRequest.getPhoneNumber());
         users.setRole(registerRequest.getRole());
         return userRepo.save(users);
     }
