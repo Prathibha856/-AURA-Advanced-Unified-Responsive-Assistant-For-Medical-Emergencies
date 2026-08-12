@@ -22,8 +22,8 @@ public class Config {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
-    private JwtFilter jwtFilter;
+//    @Autowired
+//    private JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
