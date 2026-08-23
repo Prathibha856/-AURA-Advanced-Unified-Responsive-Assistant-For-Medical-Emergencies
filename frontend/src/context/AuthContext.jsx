@@ -2,12 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ROLES } from '../config/roles';
 
 /**
- * AuthContext — Temporary Frontend Development Layer
+ * AuthContext — Centralized Frontend Authentication State Management
  * 
- * NOTE: This is an architectural placeholder for frontend development.
- * It does NOT implement real backend security or JWT validation.
- * It is structured to be seamlessly replaced by Spring Boot authentication (e.g. JWT/OAuth2)
- * in subsequent development phases.
+ * Provides mock role-based authentication state for PATIENT, HOSPITAL_ADMIN, and SUPPLY_ADMIN.
+ * Designed to interface with Spring Boot JWT Bearer authentication endpoints in backend integration.
  */
 
 const AuthContext = createContext(null);
@@ -16,36 +14,34 @@ const STORAGE_KEY_USER = 'aura_dev_user';
 const STORAGE_KEY_ROLE = 'aura_dev_role';
 
 export function AuthProvider({ children }) {
-  // Initialize from sessionStorage or use development patient default
+  // Initialize from sessionStorage; default to null (unauthenticated)
   const [user, setUser] = useState(() => {
     try {
       const savedUser = sessionStorage.getItem(STORAGE_KEY_USER);
-      if (savedUser !== null) {
-        return savedUser ? JSON.parse(savedUser) : null;
+      if (savedUser) {
+        return JSON.parse(savedUser);
       }
-      // Development fallback user
-      return { id: 'patient-001', name: 'Sarah Jenkins', email: 'sarah.j@aura.med' };
+      return null;
     } catch {
-      return { id: 'patient-001', name: 'Sarah Jenkins', email: 'sarah.j@aura.med' };
+      return null;
     }
   });
 
   const [role, setRole] = useState(() => {
     try {
       const savedRole = sessionStorage.getItem(STORAGE_KEY_ROLE);
-      if (savedRole !== null) {
-        return savedRole || null;
+      if (savedRole) {
+        return savedRole;
       }
-      // Development fallback role
-      return ROLES.PATIENT;
+      return null;
     } catch {
-      return ROLES.PATIENT;
+      return null;
     }
   });
 
   const isAuthenticated = Boolean(user && role);
 
-  // Sync state with session storage for developer convenience during page refreshes
+  // Sync state with session storage
   useEffect(() => {
     try {
       if (user) {
@@ -60,22 +56,28 @@ export function AuthProvider({ children }) {
         sessionStorage.removeItem(STORAGE_KEY_ROLE);
       }
     } catch {
-      // Ignore storage errors in restricted dev environments
+      // Ignore storage errors
     }
   }, [user, role]);
 
   /**
-   * Mock login function for frontend testing
+   * Mock login function
    * @param {Object} userData - User profile details (e.g., { id, name, email })
-   * @param {string} userRole - Role from ROLES (PATIENT, HOSPITAL_ADMIN, SUPPLY_ADMIN)
+   * @param {string} userRole - Target role from ROLES (PATIENT, HOSPITAL_ADMIN, SUPPLY_ADMIN)
    */
   const login = (userData, userRole = ROLES.PATIENT) => {
     setUser(userData);
     setRole(userRole);
+    try {
+      sessionStorage.setItem(STORAGE_KEY_USER, JSON.stringify(userData));
+      sessionStorage.setItem(STORAGE_KEY_ROLE, userRole);
+    } catch {
+      // Ignore storage errors
+    }
   };
 
   /**
-   * Mock logout function
+   * Complete Logout function
    */
   const logout = () => {
     setUser(null);
@@ -90,8 +92,6 @@ export function AuthProvider({ children }) {
 
   /**
    * Development role switcher utility
-   * Allows fast testing of role-gated UI without re-authenticating
-   * @param {string} newRole - Target role
    */
   const switchRole = (newRole) => {
     if (Object.values(ROLES).includes(newRole)) {
@@ -114,9 +114,6 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/**
- * Custom hook to consume AuthContext safely
- */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
