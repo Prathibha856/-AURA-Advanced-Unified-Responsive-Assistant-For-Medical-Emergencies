@@ -19,14 +19,14 @@ public class LoginService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JWTService jwtService;
+    private JwtService jwtService;
 
     @Autowired
     AuthenticationManager authenticationManager;
 
     public LoginResponse login(LoginRequest request) {
         // 1. Check if user exists by email
-        Users user = userRepo.findByUserEmail(request.getEmail())
+        Users user = userRepo.findByUserEmail(request.getPrincipal())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
         // 2. Verify password against encrypted password hash in DB

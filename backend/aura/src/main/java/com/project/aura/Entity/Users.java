@@ -39,9 +39,9 @@ public class Users {
     private Role role;
 
     public enum Role{
-        PATIENT,
-        HOSPITAL_ADMIN,
-        SUPPLY_ADMIN;
+        PATIENT, //0
+        HOSPITAL_ADMIN, //1
+        SUPPLY_ADMIN; //2
 
     }
 //    in DB, the enum roles will in numbers, not in actuall name

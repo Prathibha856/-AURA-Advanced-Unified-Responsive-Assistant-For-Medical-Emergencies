@@ -15,14 +15,23 @@ public class MyUsersDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepo userRepo;
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Users users = userRepo.findByUsername(username);
-        if (users==null){
-            System.out.println("User not found");
-            throw new UsernameNotFoundException("User not found");
+    @Override
+    public UserDetails loadUserByUsername(String principal) throws UsernameNotFoundException {
+
+        // 1. Try by username first
+        Users users = userRepo.findByUsername(principal);
+
+        // 2. Fall back to email if no username match
+        if (users == null) {
+            users = userRepo.findByUserEmail(principal).orElse(null);
         }
+
+        if (users == null) {
+            System.out.println("User not found for principal: " + principal);
+            throw new UsernameNotFoundException("User not found: " + principal);
+        }
+
         return new UserPrincipal(users);
     }
 }

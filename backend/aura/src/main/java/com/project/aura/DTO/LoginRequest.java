@@ -1,17 +1,17 @@
 package com.project.aura.DTO;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class LoginRequest {
-    private String username;
-    private String email;
+    /** Can be either username or email — both are accepted */
+    //below annotation can be use to accept either username or email as input
+    @JsonAlias({ "username", "email"})
+    private String principal;
     private String password;
+
 }
