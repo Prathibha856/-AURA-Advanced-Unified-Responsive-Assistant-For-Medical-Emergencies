@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { ROLES } from '../config/roles';
 import { 
   Heart, 
   Activity, 
@@ -9,21 +11,61 @@ import {
   Menu, 
   X,
   ChevronRight,
-  User
+  User,
+  Building2,
+  BookOpen,
+  LogOut,
+  LogIn,
+  ShieldCheck
 } from 'lucide-react';
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, role, user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { path: '/', label: 'Home', icon: Heart },
-    { path: '/patient/dashboard', label: 'Dashboard', icon: User },
-    { path: '/predict', label: 'Predict', icon: Activity },
-    { path: '/emergency', label: 'Emergency', icon: AlertTriangle },
-    { path: '/supply-chain', label: 'Supply Chain', icon: Package },
-    { path: '/chatbot', label: 'Chatbot', icon: MessageSquare },
-  ];
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+    navigate('/access');
+  };
+
+  // Determine role-appropriate navigation links
+  let navLinks = [];
+
+  if (!isAuthenticated) {
+    navLinks = [
+      { path: '/', label: 'Home', icon: Heart },
+      { path: '/predict', label: 'Predict', icon: Activity },
+      { path: '/hospitals', label: 'Hospitals', icon: Building2 },
+      { path: '/emergency', label: 'Emergency', icon: AlertTriangle },
+      { path: '/chatbot', label: 'Chatbot', icon: MessageSquare },
+    ];
+  } else if (role === ROLES.PATIENT) {
+    navLinks = [
+      { path: '/', label: 'Home', icon: Heart },
+      { path: '/patient/dashboard', label: 'Dashboard', icon: User },
+      { path: '/predict', label: 'Predict', icon: Activity },
+      { path: '/patient/medical-information', label: 'Medical Info', icon: BookOpen },
+      { path: '/hospitals', label: 'Hospitals', icon: Building2 },
+      { path: '/emergency', label: 'Emergency', icon: AlertTriangle },
+      { path: '/chatbot', label: 'Chatbot', icon: MessageSquare },
+    ];
+  } else if (role === ROLES.HOSPITAL_ADMIN) {
+    navLinks = [
+      { path: '/hospital/dashboard', label: 'Hospital Portal', icon: Building2 },
+      { path: '/emergency', label: 'Emergency SOS Center', icon: AlertTriangle },
+      { path: '/hospitals', label: 'Capacity & Beds', icon: Building2 },
+      { path: '/supply-chain', label: 'Hospital Supplies', icon: Package },
+    ];
+  } else if (role === ROLES.SUPPLY_ADMIN) {
+    navLinks = [
+      { path: '/supply-chain', label: 'Supply Operations', icon: Package },
+      { path: '/hospitals', label: 'Facility Telemetry', icon: Building2 },
+      { path: '/emergency', label: 'Emergency Logistics', icon: AlertTriangle },
+    ];
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
@@ -49,27 +91,44 @@ function Navbar() {
               <Link
                 key={path}
                 to={path}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
                   location.pathname === path
                     ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
                     : 'text-slate-600 hover:text-blue-600 hover:bg-white/80'
                 }`}
               >
-                <Icon size={16} />
+                <Icon size={15} />
                 <span>{label}</span>
               </Link>
             ))}
           </nav>
 
-          {/* Quick Action Button & Mobile Hamburger */}
+          {/* Right Action Controls: Access / Log In / Log Out */}
           <div className="flex items-center gap-3">
-            <Link
-              to="/emergency"
-              className="hidden lg:flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-md shadow-red-600/20 uppercase tracking-wider animate-pulse hover:animate-none"
-            >
-              <AlertTriangle className="w-4 h-4" />
-              SOS Emergency
-            </Link>
+            {isAuthenticated ? (
+              <div className="hidden lg:flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-xs font-extrabold text-slate-800">{user?.name || 'Authorized User'}</p>
+                  <p className="text-[10px] text-blue-700 font-bold uppercase tracking-wider">{role}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 text-xs font-bold px-3.5 py-2 rounded-xl border border-slate-200 hover:border-red-200 transition-colors cursor-pointer"
+                  title="Sign Out"
+                >
+                  <LogOut size={14} />
+                  <span>Log out</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/access"
+                className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-extrabold px-4.5 py-2.5 rounded-xl shadow-md shadow-blue-600/20 uppercase tracking-wider transition-all"
+              >
+                <LogIn size={15} />
+                <span>Access AURA</span>
+              </Link>
+            )}
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -104,15 +163,26 @@ function Navbar() {
               <ChevronRight className="w-5 h-5 opacity-70" />
             </Link>
           ))}
-          <div className="pt-2">
-            <Link
-              to="/emergency"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-bold py-3 rounded-xl shadow-md uppercase tracking-wider text-sm"
-            >
-              <AlertTriangle className="w-5 h-5" />
-              Trigger Emergency SOS
-            </Link>
+
+          <div className="pt-2 border-t border-slate-100">
+            {isAuthenticated ? (
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 border border-red-200 font-bold py-3 rounded-xl shadow-xs uppercase tracking-wider text-sm cursor-pointer"
+              >
+                <LogOut className="w-5 h-5" />
+                <span>Sign Out</span>
+              </button>
+            ) : (
+              <Link
+                to="/access"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md uppercase tracking-wider text-sm"
+              >
+                <LogIn className="w-5 h-5" />
+                <span>Access AURA</span>
+              </Link>
+            )}
           </div>
         </div>
       )}
