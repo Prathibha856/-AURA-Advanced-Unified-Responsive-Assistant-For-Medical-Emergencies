@@ -15,7 +15,6 @@ public class RegisterRequest {
     private String username;
     private String email;
     private String password;
-    private String phoneNumber;
     private Users.Role role; // PATIENT, HOSPITAL_ADMIN, or SUPPLY_ADMIN
 }
 

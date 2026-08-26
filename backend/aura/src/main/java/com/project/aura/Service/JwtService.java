@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${jwt.secret:YXVyYVNlY3JldEtleUZvckp3dEF1dGhlbnRpY2F0aW9uMjAyNkF1cmFQcm9qZWN0}")
+    @Value("${jwt.secret: YXVyYVNlY3JldEtleUZvckp3dEF1dGhlbnRpY2F0aW9uMjAyNkF1cmFQcm9qZWN0}")
     private String secretKey;
 
     @Value("${jwt.expiration}")
@@ -24,7 +24,7 @@ public class JwtService {
     /**
      * Generate a JWT token for the given username (used as subject).
      */
-    public String generateToken(String username, String name) {
+    public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())

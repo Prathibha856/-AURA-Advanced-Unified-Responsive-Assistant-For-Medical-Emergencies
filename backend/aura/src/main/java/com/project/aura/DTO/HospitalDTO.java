@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class HospitalDTO {
 
-    private Integer hospitalId;
+//    private Integer hospitalId;
     private String name;
     private String address;
     private Double latitude;

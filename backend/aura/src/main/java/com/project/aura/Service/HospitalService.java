@@ -21,8 +21,6 @@ public class HospitalService {
     @Autowired
     private UserRepo userRepo;
 
-    // ── Public Read Methods (Anyone can view hospitals) ──────────────────────
-
     public List<HospitalDTO> getAllHospitals() {
         return hospitalRepo.findAll().stream()
                 .map(this::toDTO)
@@ -34,12 +32,7 @@ public class HospitalService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hospital not found: " + id)));
     }
 
-    // ── Secure Write Methods (Admins Only) ───────────────────────────────────
-
-    public HospitalDTO createHospital(HospitalDTO dto, Integer requesterId) {
-        // 1. Check if the person requesting this is actually an Admin
-        verifyAdminAccess(requesterId);
-
+    public HospitalDTO createHospital(HospitalDTO dto) {
         Hospital hospital = Hospital.builder()
                 .name(dto.getName())
                 .address(dto.getAddress())
@@ -48,19 +41,18 @@ public class HospitalService {
                 .phone(dto.getPhone())
                 .build();
 
-        // Assign the admin to the hospital
-        Users admin = userRepo.findById(requesterId).get(); // We know they exist from verifyAdminAccess
-        hospital.setAdminUser(admin);
+        if (dto.getAdminUserId() != null) {
+            Users admin = userRepo.findById(dto.getAdminUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Admin user not found: " + dto.getAdminUserId()));
+            hospital.setAdminUser(admin);
+        }
 
         return toDTO(hospitalRepo.save(hospital));
     }
 
-    public HospitalDTO updateHospital(Integer hospitalId, HospitalDTO dto, Integer requesterId) {
-        // 1. Check if the person requesting this is actually an Admin
-        verifyAdminAccess(requesterId);
-
-        Hospital hospital = hospitalRepo.findById(hospitalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Hospital not found: " + hospitalId));
+    public HospitalDTO updateHospital(Integer id, HospitalDTO dto) {
+        Hospital hospital = hospitalRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hospital not found: " + id));
 
         hospital.setName(dto.getName());
         hospital.setAddress(dto.getAddress());
@@ -68,40 +60,27 @@ public class HospitalService {
         hospital.setLongitude(dto.getLongitude());
         hospital.setPhone(dto.getPhone());
 
+        if (dto.getAdminUserId() != null) {
+            Users admin = userRepo.findById(dto.getAdminUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Admin user not found: " + dto.getAdminUserId()));
+            hospital.setAdminUser(admin);
+        }
+
         return toDTO(hospitalRepo.save(hospital));
     }
 
-    public void deleteHospital(Integer hospitalId, Integer requesterId) {
-        // 1. Check if the person requesting this is actually an Admin
-        verifyAdminAccess(requesterId);
-
-        if (!hospitalRepo.existsById(hospitalId)) {
-            throw new ResourceNotFoundException("Hospital not found: " + hospitalId);
+    public void deleteHospital(Integer id) {
+        if (!hospitalRepo.existsById(id)) {
+            throw new ResourceNotFoundException("Hospital not found: " + id);
         }
-        hospitalRepo.deleteById(hospitalId);
-    }
-
-    // ── Security Helper ────────────────────────────────────────────────────────
-
-    private void verifyAdminAccess(Integer userId) {
-        if (userId == null) {
-            throw new RuntimeException("Unauthorized: User ID is required");
-        }
-
-        Users user = userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-
-        // Assuming your enum is named Role and has HOSPITAL_ADMIN
-        if (!user.getRole().name().equals("HOSPITAL_ADMIN")) {
-            throw new RuntimeException("Access Denied: Only Hospital Admins can perform this action");
-        }
+        hospitalRepo.deleteById(id);
     }
 
     // ── Mapper ──────────────────────────────────────────────────────────────────
 
     public HospitalDTO toDTO(Hospital h) {
         return HospitalDTO.builder()
-                .hospitalId(h.getHospitalId())
+//                .hospitalId(h.getHospitalId())
                 .name(h.getName())
                 .address(h.getAddress())
                 .latitude(h.getLatitude())

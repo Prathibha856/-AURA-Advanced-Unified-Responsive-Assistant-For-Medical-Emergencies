@@ -16,49 +16,34 @@ public class HospitalController {
     @Autowired
     private HospitalService hospitalService;
 
-    /** GET /api/hospitals (Public - Anyone can view) */
+    /** GET /api/hospitals */
     @GetMapping
     public ResponseEntity<List<HospitalDTO>> getAllHospitals() {
         return ResponseEntity.ok(hospitalService.getAllHospitals());
     }
 
-    /** GET /api/hospitals/{id} (Public - Anyone can view) */
+    /** GET /api/hospitals/{id} */
     @GetMapping("/{id}")
     public ResponseEntity<HospitalDTO> getHospitalById(@PathVariable Integer id) {
         return ResponseEntity.ok(hospitalService.getHospitalById(id));
     }
 
-    /** POST /api/hospitals?requesterId=1 (Secured - Admins Only) */
+    /** POST /api/hospitals */
     @PostMapping
-    public ResponseEntity<?> createHospital(@RequestBody HospitalDTO dto, @RequestParam Integer requesterId) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(hospitalService.createHospital(dto, requesterId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
+    public ResponseEntity<HospitalDTO> createHospital(@RequestBody HospitalDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(hospitalService.createHospital(dto));
     }
 
-    /** PUT /api/hospitals/{id}?requesterId=1 (Secured - Admins Only) */
+    /** PUT /api/hospitals/{id} */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHospital(
-            @PathVariable Integer id,
-            @RequestBody HospitalDTO dto,
-            @RequestParam Integer requesterId) {
-        try {
-            return ResponseEntity.ok(hospitalService.updateHospital(id, dto, requesterId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
+    public ResponseEntity<HospitalDTO> updateHospital(@PathVariable Integer id, @RequestBody HospitalDTO dto) {
+        return ResponseEntity.ok(hospitalService.updateHospital(id, dto));
     }
 
-    /** DELETE /api/hospitals/{id}?requesterId=1 (Secured - Admins Only) */
+    /** DELETE /api/hospitals/{id} */
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteHospital(@PathVariable Integer id, @RequestParam Integer requesterId) {
-        try {
-            hospitalService.deleteHospital(id, requesterId);
-            return ResponseEntity.ok("Hospital deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
+    public ResponseEntity<String> deleteHospital(@PathVariable Integer id) {
+        hospitalService.deleteHospital(id);
+        return ResponseEntity.ok("Hospital deleted successfully");
     }
 }
