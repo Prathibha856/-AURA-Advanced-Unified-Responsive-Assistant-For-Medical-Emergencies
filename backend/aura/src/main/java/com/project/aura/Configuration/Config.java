@@ -3,6 +3,7 @@ package com.project.aura.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -42,6 +43,16 @@ public class Config {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints — no token required
                         .requestMatchers("/api/auth/**", "/").permitAll()
+
+
+                        // Lock down hospital modification routes to admins only
+                        .requestMatchers(HttpMethod.POST, "/api/hospitals/**").hasAuthority("HOSPITAL_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/hospitals/**").hasAuthority("HOSPITAL_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/hospitals/**").hasAuthority("HOSPITAL_ADMIN")
+
+                        // Allow all authenticated users (including patients) to view hospitals
+                        .requestMatchers(HttpMethod.GET, "/api/hospitals/**").authenticated()
+
                         // All other endpoints require a valid JWT
                         .anyRequest().authenticated()
                 )
