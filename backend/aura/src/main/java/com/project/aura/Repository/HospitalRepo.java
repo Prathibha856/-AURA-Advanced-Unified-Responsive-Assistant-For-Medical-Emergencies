@@ -14,6 +14,8 @@ public interface HospitalRepo extends JpaRepository<Hospital, Integer> {
 
     Optional<Hospital> findByAdminUser_Userid(Integer userid);
 
+    void deleteByName(String hospitalName);
+
     /**
      * Finds nearest hospitals using the Haversine formula in PostgreSQL.
      * Sorted ascending by distance from the given coordinates.
@@ -35,4 +37,6 @@ public interface HospitalRepo extends JpaRepository<Hospital, Integer> {
             @Param("lon") double lon,
             @Param("limitVal") int limitVal
     );
+
+    boolean existsByName(String name);
 }

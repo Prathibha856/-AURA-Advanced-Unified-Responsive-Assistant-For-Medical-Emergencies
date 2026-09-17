@@ -46,4 +46,12 @@ public class HospitalController {
         hospitalService.deleteHospital(id);
         return ResponseEntity.ok("Hospital deleted successfully");
     }
+
+    @DeleteMapping("/name/{name}")
+    public ResponseEntity<String> deleteHospitalByName(@PathVariable String name) {
+        // Note: URLs with spaces will be encoded as %20 by the client,
+        // Spring automatically decodes this back to " " for the variable.
+        hospitalService.deleteHospitalByName(name);
+        return ResponseEntity.ok("Hospital '" + name + "' deleted successfully");
+    }
 }

@@ -6,6 +6,7 @@ import com.project.aura.Entity.Users;
 import com.project.aura.Exception.ResourceNotFoundException;
 import com.project.aura.Repository.HospitalRepo;
 import com.project.aura.Repository.UserRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +75,14 @@ public class HospitalService {
             throw new ResourceNotFoundException("Hospital not found: " + id);
         }
         hospitalRepo.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteHospitalByName(String name) {
+        if (!hospitalRepo.existsByName(name)) {
+            throw new ResourceNotFoundException("Hospital not found: " + name);
+        }
+        hospitalRepo.deleteByName(name);
     }
 
     // ── Mapper ──────────────────────────────────────────────────────────────────
