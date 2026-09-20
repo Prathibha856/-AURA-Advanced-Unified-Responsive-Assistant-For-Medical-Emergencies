@@ -19,4 +19,7 @@ public class SosAlertResponseDTO {
     private Double longitude;
     private SosAlert.AlertStatus status;
     private LocalDateTime createdAt;
+    private LocalDateTime acceptedAt;
+    private LocalDateTime resolvedAt;
+    private String responseMessage;
 }
