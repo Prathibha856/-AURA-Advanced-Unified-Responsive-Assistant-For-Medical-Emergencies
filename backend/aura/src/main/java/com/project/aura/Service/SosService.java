@@ -115,9 +115,9 @@ public class SosService {
      * The current hospital is recorded in the rejection list, and the alert
      * is automatically rerouted to the next nearest hospital that hasn't
      * previously rejected it.
-     *
+
      * Twilio automatically calls + SMS the NEW hospital after rerouting.
-     *
+
      * If no more hospitals are available, the alert stays with status REJECTED.
      */
     public SosAlertResponseDTO rejectAlert(Integer alertId, String reason) {
@@ -200,7 +200,6 @@ public class SosService {
     /**
      * Triggers both a voice call and SMS to the assigned hospital.
      * Both run asynchronously (background threads) so they never block the API response.
-     *
      * If the hospital has no phone number, a warning is logged and no call is made.
      */
     private void notifyHospitalViaTwilio(SosAlert alert, Users user) {
