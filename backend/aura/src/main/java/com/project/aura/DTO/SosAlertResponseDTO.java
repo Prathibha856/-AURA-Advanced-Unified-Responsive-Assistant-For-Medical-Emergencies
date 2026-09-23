@@ -14,6 +14,7 @@ public class SosAlertResponseDTO {
 
     private Integer alertId;
     private Integer userId;
+    private String userName;
     private HospitalDTO nearestHospital;
     private Double latitude;
     private Double longitude;

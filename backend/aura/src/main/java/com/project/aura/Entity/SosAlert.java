@@ -22,7 +22,7 @@ public class SosAlert {
     @Column(name = "alert_id")
     private Integer alertId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 

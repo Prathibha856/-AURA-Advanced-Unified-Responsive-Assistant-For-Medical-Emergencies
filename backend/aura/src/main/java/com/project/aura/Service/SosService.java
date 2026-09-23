@@ -316,6 +316,7 @@ public class SosService {
         return SosAlertResponseDTO.builder()
                 .alertId(a.getAlertId())
                 .userId(a.getUser().getUserid())
+                .userName(a.getUser().getUsername())
                 .nearestHospital(hospitalDTO)
                 .latitude(a.getLatitude())
                 .longitude(a.getLongitude())
