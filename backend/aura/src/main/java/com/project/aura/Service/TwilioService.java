@@ -58,6 +58,11 @@ public class TwilioService {
             return;
         }
 
+        if (twilioPhoneNumber == null || twilioPhoneNumber.isBlank()) {
+            log.error("Cannot place emergency call for alert #{}: 'twilio.phone-number' is missing!", alertId);
+            return;
+        }
+
         try {
             String formattedPhone = normalizePhoneNumber(hospitalPhone);
             Call call = Call.creator(
@@ -104,6 +109,11 @@ public class TwilioService {
         if (!enabled) {
             log.info("[TWILIO DISABLED] Would have sent SMS to {} for alert #{}", hospitalPhone, alertId);
             log.debug("SMS Body: {}", smsBody);
+            return;
+        }
+
+        if (twilioPhoneNumber == null || twilioPhoneNumber.isBlank()) {
+            log.error("Cannot send emergency SMS for alert #{}: 'twilio.phone-number' is missing!", alertId);
             return;
         }
 

@@ -32,8 +32,13 @@ public class TwilioConfig {
     @PostConstruct
     public void initTwilio() {
         if (enabled) {
+            if (accountSid == null || accountSid.isBlank() || authToken == null || authToken.isBlank()) {
+                log.error("Twilio is ENABLED, but 'twilio.account-sid' or 'twilio.auth-token' is EMPTY! " +
+                          "Check that your .env file is loaded and contains TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN.");
+                return;
+            }
             Twilio.init(accountSid, authToken);
-            log.info("Twilio SDK initialised — Voice calls and SMS are ENABLED");
+            log.info("Twilio SDK initialised — Voice calls and SMS are ENABLED for account: {}", accountSid);
         } else {
             log.warn("Twilio is DISABLED (twilio.enabled=false). SOS calls/SMS will be logged but not sent.");
         }

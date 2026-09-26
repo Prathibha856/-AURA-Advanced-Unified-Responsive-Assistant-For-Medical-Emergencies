@@ -17,20 +17,32 @@ public class AuraApplication {
 
 	public static void main(String[] args) {
 
-        // Find and load .env from current directory, ./backend/aura, or parent directory
-        Dotenv dotenv;
-        if (new File(".env").exists()) {
-            dotenv = Dotenv.configure().load();
-            log.info("Loaded .env from current directory: {}", new File(".env").getAbsolutePath());
-        } else if (new File("backend/aura/.env").exists()) {
-            dotenv = Dotenv.configure().directory("./backend/aura").load();
-            log.info("Loaded .env from ./backend/aura/.env");
-        } else if (new File("../.env").exists()) {
-            dotenv = Dotenv.configure().directory("../").load();
-            log.info("Loaded .env from parent directory");
-        } else {
+        // Find and load .env across common project paths
+        File[] candidateFiles = new File[] {
+            new File(".env"),
+            new File("aura/.env"),
+            new File("backend/aura/.env"),
+            new File("../backend/aura/.env"),
+            new File("../.env")
+        };
+
+        Dotenv dotenv = null;
+        for (File candidate : candidateFiles) {
+            if (candidate.exists()) {
+                File dir = candidate.getParentFile();
+                if (dir == null) {
+                    dotenv = Dotenv.configure().load();
+                } else {
+                    dotenv = Dotenv.configure().directory(dir.getPath()).load();
+                }
+                log.info("Loaded .env from: {}", candidate.getAbsolutePath());
+                break;
+            }
+        }
+
+        if (dotenv == null) {
             dotenv = Dotenv.configure().ignoreIfMissing().load();
-            log.warn("No .env file found in ., ./backend/aura, or ../. Using system environment defaults.");
+            log.warn("No .env file found in candidate locations. Using system environment defaults.");
         }
 
         dotenv.entries().forEach(entry -> {
