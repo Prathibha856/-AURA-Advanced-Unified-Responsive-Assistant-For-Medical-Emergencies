@@ -2,14 +2,16 @@ package com.project.aura.Service;
 
 import com.twilio.rest.api.v2010.account.Call;
 import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.twiml.VoiceResponse;
+import com.twilio.twiml.voice.Pause;
+import com.twilio.twiml.voice.Say;
 import com.twilio.type.PhoneNumber;
+import com.twilio.type.Twiml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.net.URI;
 
 /**
  * TwilioService — handles emergency Voice Calls and SMS notifications
@@ -29,18 +31,24 @@ public class TwilioService {
     @Value("${twilio.phone-number}")
     private String twilioPhoneNumber;
 
-    @Value("${twilio.voice-url:http://demo.twilio.com/docs/voice.xml}")
-    private String twilioVoiceUrl;
-
     @Value("${twilio.enabled:false}")
     private boolean enabled;
+
+    @jakarta.annotation.PostConstruct
+    public void logConfig() {
+        log.info("╔══════════════════════════════════════════════════════════╗");
+        log.info("║  TwilioService Configuration at Startup                 ║");
+        log.info("║  enabled       = {}                                     ", enabled);
+        log.info("║  phoneNumber   = [{}]                                   ", twilioPhoneNumber);
+        log.info("╚══════════════════════════════════════════════════════════╝");
+    }
 
     // ── Voice Call ────────────────────────────────────────────────────────────────
 
     /**
      * Makes an automated emergency voice call to the hospital.
-     * Uses a TwiML Voice URL to speak an emergency message via text-to-speech.
-     * Compatible with both Twilio Trial accounts and upgraded accounts.
+     * Uses inline TwiML to speak a custom emergency message with patient details.
+     * The message is repeated twice for clarity.
      *
      * @param hospitalPhone  Hospital phone number (e.g. "+919876543210")
      * @param patientName    Name of the patient who triggered SOS
@@ -65,10 +73,36 @@ public class TwilioService {
 
         try {
             String formattedPhone = normalizePhoneNumber(hospitalPhone);
+
+            // Build the emergency voice message
+            String emergencyMessage = String.format(
+                    "Emergency S.O.S. Alert from Aura Health System. " +
+                    "Patient %s needs immediate assistance. " +
+                    "Alert I.D. number %d. " +
+                    "Patient location: latitude %.4f, longitude %.4f. " +
+                    "Google Maps link has been sent via S.M.S. " +
+                    "Please open your Aura portal now to ACCEPT and dispatch an ambulance immediately.",
+                    patientName, alertId, latitude, longitude
+            );
+
+            // Build TwiML: say the message, pause, then repeat it
+            VoiceResponse voiceResponse = new VoiceResponse.Builder()
+                    .say(new Say.Builder(emergencyMessage)
+                            .voice(Say.Voice.POLLY_JOANNA)
+                            .build())
+                    .pause(new Pause.Builder().length(2).build())
+                    .say(new Say.Builder("I repeat. " + emergencyMessage)
+                            .voice(Say.Voice.POLLY_JOANNA)
+                            .build())
+                    .build();
+
+            String twimlXml = voiceResponse.toXml();
+            log.debug("TwiML for alert #{}: {}", alertId, twimlXml);
+
             Call call = Call.creator(
                     new PhoneNumber(formattedPhone),    // To: hospital phone
                     new PhoneNumber(twilioPhoneNumber),  // From: your Twilio number
-                    URI.create(twilioVoiceUrl)           // Voice URL (works with Trial accounts)
+                    new Twiml(twimlXml)                  // Inline TwiML with emergency message
             ).create();
 
             log.info("Emergency call placed to {} — Call SID: {} — Alert #{} — Status: {}",
@@ -85,6 +119,9 @@ public class TwilioService {
      * Sends an emergency SMS to the hospital as a backup notification.
      * SMS is sent in addition to the voice call to ensure the alert
      * is received even if the call is missed.
+     *
+     * NOTE: Twilio Trial accounts can only send SMS to verified phone numbers.
+     * To verify a number, go to: Twilio Console → Phone Numbers → Verified Caller IDs
      *
      * @param hospitalPhone  Hospital phone number (e.g. "+919876543210")
      * @param patientName    Name of the patient who triggered SOS
@@ -125,11 +162,13 @@ public class TwilioService {
                     smsBody
             ).create();
 
-            log.info("Emergency SMS sent to {} — Message SID: {} — Alert #{}",
-                    formattedPhone, message.getSid(), alertId);
+            log.info("Emergency SMS sent to {} — Message SID: {} — Alert #{} — Status: {}",
+                    formattedPhone, message.getSid(), alertId, message.getStatus());
         } catch (Exception e) {
-            log.warn("⚠SMS notification skipped for {} (Trial accounts require registered SMS templates): {}",
-                    hospitalPhone, e.getMessage());
+            log.error("Failed to send SMS to {} for alert #{}: {}",
+                    hospitalPhone, alertId, e.getMessage());
+            log.warn("SMS tip: Twilio Trial accounts can only send SMS to verified numbers. " +
+                     "Verify the number at: https://console.twilio.com/us1/develop/phone-numbers/manage/verified");
         }
     }
 
@@ -170,3 +209,4 @@ public class TwilioService {
         return "+" + cleaned;
     }
 }
+
