@@ -65,12 +65,15 @@ export function AuthProvider({ children }) {
    * @param {Object} userData - User profile details (e.g., { id, name, email })
    * @param {string} userRole - Target role from ROLES (PATIENT, HOSPITAL_ADMIN, SUPPLY_ADMIN)
    */
-  const login = (userData, userRole = ROLES.PATIENT) => {
+  const login = (userData, userRole = ROLES.PATIENT, token = null) => {
     setUser(userData);
     setRole(userRole);
     try {
       sessionStorage.setItem(STORAGE_KEY_USER, JSON.stringify(userData));
       sessionStorage.setItem(STORAGE_KEY_ROLE, userRole);
+      if (token) {
+        sessionStorage.setItem('aura_auth_token', token);
+      }
     } catch {
       // Ignore storage errors
     }
@@ -85,6 +88,7 @@ export function AuthProvider({ children }) {
     try {
       sessionStorage.removeItem(STORAGE_KEY_USER);
       sessionStorage.removeItem(STORAGE_KEY_ROLE);
+      sessionStorage.removeItem('aura_auth_token');
     } catch {
       // Ignore storage errors
     }

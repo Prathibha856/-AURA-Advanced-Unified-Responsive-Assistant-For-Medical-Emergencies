@@ -14,6 +14,7 @@ import Hospitals from './pages/Hospitals';
 
 // Auth Experience Pages
 import AccessPortal from './pages/auth/AccessPortal';
+import AuthPortal from './pages/auth/AuthPortal';
 import PatientLogin from './pages/auth/PatientLogin';
 import PatientSignup from './pages/auth/PatientSignup';
 import HospitalAdminLogin from './pages/auth/HospitalAdminLogin';
@@ -41,6 +42,9 @@ function App() {
             <Route path="/chatbot" element={<Chatbot />} />
 
             {/* Authentication Entry Routes */}
+            <Route path="/auth" element={<AuthPortal />} />
+            <Route path="/login" element={<AuthPortal initialTab="login" />} />
+            <Route path="/register" element={<AuthPortal initialTab="register" />} />
             <Route path="/login/patient" element={<PatientLogin />} />
             <Route path="/signup/patient" element={<PatientSignup />} />
             <Route path="/login/hospital-admin" element={<HospitalAdminLogin />} />

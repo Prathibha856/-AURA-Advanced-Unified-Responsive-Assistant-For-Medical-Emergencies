@@ -16,6 +16,8 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { ROLES } from '../config/roles';
 import {
   Activity,
   AlertTriangle,
@@ -45,6 +47,7 @@ import {
 // 1. NAVBAR SECTION
 // ============================================================================
 function Navbar() {
+  const { isAuthenticated, role } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('Home');
   const navigate = useNavigate();
@@ -116,6 +119,22 @@ function Navbar() {
 
           {/* Right Action Button & Mobile Hamburger */}
           <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <Link
+                to={role === ROLES.HOSPITAL_ADMIN ? '/hospital/dashboard' : role === ROLES.SUPPLY_ADMIN ? '/supply-chain' : '/patient/dashboard'}
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3.5 py-2 rounded-xl transition-colors"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/auth"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 bg-white hover:bg-slate-50 border border-slate-200 hover:border-blue-400 px-3.5 py-2 rounded-xl shadow-2xs transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
+
             <Link
               to="/emergency"
               className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-bold px-4.5 py-2.5 rounded-xl shadow-lg shadow-rose-600/30 hover:shadow-rose-600/50 uppercase tracking-wider animate-pulse hover:animate-none transition-all duration-300"
@@ -153,7 +172,25 @@ function Navbar() {
               <ChevronRight className="w-5 h-5 opacity-70" />
             </button>
           ))}
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col gap-2">
+            {isAuthenticated ? (
+              <Link
+                to={role === ROLES.HOSPITAL_ADMIN ? '/hospital/dashboard' : role === ROLES.SUPPLY_ADMIN ? '/supply-chain' : '/patient/dashboard'}
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-xl text-sm font-bold bg-blue-50 text-blue-700 border border-blue-200"
+              >
+                Go to Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/auth"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-xl text-sm font-bold text-slate-700 border border-slate-200 hover:bg-slate-50"
+              >
+                Sign In / Register
+              </Link>
+            )}
+
             <Link
               to="/emergency"
               onClick={() => setMobileMenuOpen(false)}
@@ -215,7 +252,7 @@ function HeroSection() {
             {/* Dual CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
               <Link
-                to="/access"
+                to="/auth"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:scale-105 transition-all duration-300 text-base animate-pulse-subtle group"
               >
                 <span>Get Started</span>
