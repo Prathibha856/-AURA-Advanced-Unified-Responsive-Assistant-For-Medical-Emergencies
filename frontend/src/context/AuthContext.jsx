@@ -1,27 +1,32 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ROLES } from '../config/roles';
+import api from '../services/api';
 
 /**
- * AuthContext — Centralized Frontend Authentication State Management
+ * AuthContext — Production JWT Role-Based Authentication State Management
  * 
- * Provides mock role-based authentication state for PATIENT, HOSPITAL_ADMIN, and SUPPLY_ADMIN.
- * Designed to interface with Spring Boot JWT Bearer authentication endpoints in backend integration.
+ * Synchronizes JWT tokens and user metadata with localStorage:
+ * - "token": Stores the raw JWT Bearer token
+ * - "user": Stores serialized user metadata { id, username, email, role }
+ * - "role": Stores the user role (PATIENT, HOSPITAL_ADMIN, SUPPLY_ADMIN)
  */
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY_USER = 'aura_dev_user';
-const STORAGE_KEY_ROLE = 'aura_dev_role';
-
 export function AuthProvider({ children }) {
-  // Initialize from sessionStorage; default to null (unauthenticated)
+  // Initialize state directly from localStorage
+  const [token, setToken] = useState(() => {
+    try {
+      return localStorage.getItem('token') || null;
+    } catch {
+      return null;
+    }
+  });
+
   const [user, setUser] = useState(() => {
     try {
-      const savedUser = sessionStorage.getItem(STORAGE_KEY_USER);
-      if (savedUser) {
-        return JSON.parse(savedUser);
-      }
-      return null;
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
     } catch {
       return null;
     }
@@ -29,90 +34,158 @@ export function AuthProvider({ children }) {
 
   const [role, setRole] = useState(() => {
     try {
-      const savedRole = sessionStorage.getItem(STORAGE_KEY_ROLE);
-      if (savedRole) {
-        return savedRole;
-      }
-      return null;
+      return localStorage.getItem('role') || (user && user.role) || null;
     } catch {
       return null;
     }
   });
 
-  const isAuthenticated = Boolean(user && role);
-
-  // Sync state with session storage
+  // Restore and synchronize auth state on app mount
   useEffect(() => {
     try {
-      if (user) {
-        sessionStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
-      } else {
-        sessionStorage.removeItem(STORAGE_KEY_USER);
-      }
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      const storedRole = localStorage.getItem('role');
 
-      if (role) {
-        sessionStorage.setItem(STORAGE_KEY_ROLE, role);
-      } else {
-        sessionStorage.removeItem(STORAGE_KEY_ROLE);
+      if (storedToken) {
+        setToken(storedToken);
+        sessionStorage.setItem('aura_auth_token', storedToken);
       }
-    } catch {
-      // Ignore storage errors
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+      if (storedRole) {
+        setRole(storedRole);
+      }
+    } catch (e) {
+      console.warn('Failed to restore auth from localStorage:', e);
     }
-  }, [user, role]);
+  }, []);
 
   /**
-   * Mock login function
-   * @param {Object} userData - User profile details (e.g., { id, name, email })
-   * @param {string} userRole - Target role from ROLES (PATIENT, HOSPITAL_ADMIN, SUPPLY_ADMIN)
+   * Login user with username (or email) and password
+   * Calls POST /api/auth/login
    */
-  const login = (userData, userRole = ROLES.PATIENT, token = null) => {
-    setUser(userData);
-    setRole(userRole);
+  const login = async (username, password) => {
     try {
-      sessionStorage.setItem(STORAGE_KEY_USER, JSON.stringify(userData));
-      sessionStorage.setItem(STORAGE_KEY_ROLE, userRole);
-      if (token) {
-        sessionStorage.setItem('aura_auth_token', token);
+      const response = await api.post('/auth/login', {
+        principal: username.trim(),
+        username: username.trim(),
+        password: password,
+      });
+
+      if (!response || !response.token) {
+        throw new Error('Authentication response did not contain a valid token.');
       }
-    } catch {
-      // Ignore storage errors
+
+      const jwtToken = response.token;
+      const userRole = response.role || ROLES.PATIENT;
+      const userData = {
+        id: response.userId,
+        username: response.username || username.trim(),
+        email: response.email || '',
+        role: userRole,
+      };
+
+      // Persist to localStorage
+      localStorage.setItem('token', jwtToken);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('role', userRole);
+      sessionStorage.setItem('aura_auth_token', jwtToken);
+
+      setToken(jwtToken);
+      setUser(userData);
+      setRole(userRole);
+
+      return { success: true, user: userData, role: userRole, token: jwtToken };
+    } catch (error) {
+      const errorMessage =
+        (error && error.message) || 'Login failed. Please verify your credentials.';
+      return { success: false, error: errorMessage };
     }
   };
 
   /**
-   * Complete Logout function
+   * Register new user
+   * Calls POST /api/auth/register
+   */
+  const register = async (username, email, password, targetRole = ROLES.PATIENT) => {
+    try {
+      const response = await api.post('/auth/register', {
+        username: username.trim(),
+        email: email.trim(),
+        password: password,
+        role: targetRole,
+      });
+
+      return {
+        success: true,
+        message: typeof response === 'string' ? response : 'Registration successful! Please log in.',
+      };
+    } catch (error) {
+      const errorMessage =
+        (error && error.message) || 'Registration failed. Please try again.';
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  /**
+   * Logout user, clear storage and redirect to /login
    */
   const logout = () => {
-    setUser(null);
-    setRole(null);
     try {
-      sessionStorage.removeItem(STORAGE_KEY_USER);
-      sessionStorage.removeItem(STORAGE_KEY_ROLE);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('role');
       sessionStorage.removeItem('aura_auth_token');
+      sessionStorage.removeItem('aura_dev_user');
+      sessionStorage.removeItem('aura_dev_role');
     } catch {
       // Ignore storage errors
+    }
+
+    setToken(null);
+    setUser(null);
+    setRole(null);
+
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
     }
   };
 
   /**
-   * Development role switcher utility
+   * Returns true if JWT token exists in localStorage or state
    */
-  const switchRole = (newRole) => {
-    if (Object.values(ROLES).includes(newRole)) {
-      setRole(newRole);
-      if (!user) {
-        setUser({ id: 'dev-user-1', name: 'Dev User', email: 'dev@aura.med' });
-      }
+  const isAuthenticated = () => {
+    try {
+      return Boolean(localStorage.getItem('token') || token);
+    } catch {
+      return Boolean(token);
+    }
+  };
+
+  /**
+   * Returns role from localStorage or state
+   */
+  const getUserRole = () => {
+    try {
+      return localStorage.getItem('role') || role || (user && user.role) || null;
+    } catch {
+      return role || null;
     }
   };
 
   const value = {
+    token,
     user,
     role,
+    // Supports both functional isAuthenticated() and boolean isAuthed
     isAuthenticated,
+    isAuthed: Boolean(token),
     login,
+    register,
     logout,
-    switchRole,
+    getUserRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,0 +1,19 @@
+﻿# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# Large data files (regenerable)
+knowledge_base/medical_qa.json
+knowledge_base/medquad_embeddings.json
+chroma_db/
+
+# Environment
+.env
+.env.local
+
+# Misc
+request.json

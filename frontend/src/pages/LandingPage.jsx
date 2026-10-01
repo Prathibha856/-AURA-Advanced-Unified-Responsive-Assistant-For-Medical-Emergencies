@@ -14,10 +14,11 @@
 //   9. FOOTER (Dark theme, 4 columns: Brand, Quick Links, Modules, Emergency Contact, Copyright)
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ROLES } from '../config/roles';
+import api from '../services/api';
 import {
   Activity,
   AlertTriangle,
@@ -252,7 +253,7 @@ function HeroSection() {
             {/* Dual CTAs */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
               <Link
-                to="/auth"
+                to="/login"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 hover:scale-105 transition-all duration-300 text-base animate-pulse-subtle group"
               >
                 <span>Get Started</span>
@@ -389,65 +390,218 @@ function HeroSection() {
 // 3. SYSTEM STATUS DASHBOARD
 // ============================================================================
 function SystemStatusDashboard() {
+  const [systemStatus, setSystemStatus] = useState({
+    status: 'LOADING',
+    database: 'CHECKING',
+    registeredHospitals: 0,
+    version: '...',
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchSystemStatus() {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await api.get('/system/status');
+        if (isMounted && data) {
+          setSystemStatus({
+            status: data.status || 'OPERATIONAL',
+            database: data.database || 'CONNECTED',
+            registeredHospitals: data.registeredHospitals ?? 0,
+            version: data.version || 'v2.4 Live',
+            timestamp: data.timestamp,
+          });
+        }
+      } catch {
+        if (isMounted) {
+          setError('System status unavailable. Retrying...');
+          setSystemStatus({
+            status: 'DOWN',
+            database: 'DISCONNECTED',
+            registeredHospitals: 0,
+            version: 'v2.4 Live',
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchSystemStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const isOperational = systemStatus.status === 'OPERATIONAL';
+  const isDbConnected = systemStatus.database === 'CONNECTED';
+
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-y border-slate-200/70">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl shadow-blue-900/10 border border-slate-200/90 p-6 md:p-8 border-t-2 border-t-blue-500">
           
-          {/* Header Title with Animated Green Dot */}
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-            <div className="relative flex items-center justify-center">
-              <CircleDot className="text-emerald-500 fill-emerald-500" size={22} />
-              <span className="absolute w-5 h-5 bg-emerald-500/40 rounded-full animate-ping" />
+          {/* Header Title with Live Animated Dot */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center justify-center">
+                <CircleDot
+                  className={`${
+                    loading
+                      ? 'text-amber-500 fill-amber-500'
+                      : isOperational
+                      ? 'text-emerald-500 fill-emerald-500'
+                      : 'text-rose-500 fill-rose-500'
+                  }`}
+                  size={22}
+                />
+                <span
+                  className={`absolute w-5 h-5 rounded-full animate-ping ${
+                    loading
+                      ? 'bg-amber-500/40'
+                      : isOperational
+                      ? 'bg-emerald-500/40'
+                      : 'bg-rose-500/40'
+                  }`}
+                />
+              </div>
+              <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                {loading
+                  ? '🟡 SYSTEM STATUS: CHECKING...'
+                  : isOperational
+                  ? '🟢 SYSTEM STATUS: OPERATIONAL'
+                  : '🔴 SYSTEM STATUS: DOWN'}
+              </h2>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-              🟢 SYSTEM STATUS: OPERATIONAL
-            </h2>
+
+            {/* Subtle Loading or Version Indicator */}
+            <div className="flex items-center gap-2 text-xs font-mono">
+              {loading ? (
+                <span className="inline-flex items-center gap-1.5 text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  Polling Live Status...
+                </span>
+              ) : (
+                <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 font-bold">
+                  {systemStatus.version}
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* Graceful Fallback Warning Banner if Error */}
+          {error && (
+            <div className="mb-6 p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl text-xs font-medium text-rose-800 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={16} className="text-rose-600 shrink-0" />
+                <span>{error}</span>
+              </div>
+              <span className="text-[11px] text-rose-600 font-mono hidden sm:inline">Offline Mode Active</span>
+            </div>
+          )}
 
           {/* 4 Status Items in Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            {/* Item 1 */}
-            <div className="flex items-start gap-3.5 p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 hover:bg-emerald-50 transition-colors">
-              <CheckCircle className="text-emerald-600 mt-0.5 shrink-0" size={20} />
-              <div>
-                <p className="font-bold text-slate-900 text-sm">A.M. Disease Predictor</p>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  v2.4 Live • <span className="text-emerald-700 font-bold">99.4% Accurate</span>
+            {/* Item 1: System Operational Status & Version */}
+            <div className={`flex items-start gap-3.5 p-4 rounded-2xl border transition-colors ${
+              loading
+                ? 'bg-amber-50/70 border-amber-200/80'
+                : isOperational
+                ? 'bg-emerald-50/70 border-emerald-200/80 hover:bg-emerald-50'
+                : 'bg-rose-50/70 border-rose-200/80'
+            }`}>
+              <CheckCircle className={`mt-0.5 shrink-0 ${
+                loading ? 'text-amber-600' : isOperational ? 'text-emerald-600' : 'text-rose-600'
+              }`} size={20} />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-slate-900 text-sm">AURA Core Engine</p>
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                    loading
+                      ? 'bg-amber-100 text-amber-800'
+                      : isOperational
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-rose-100 text-rose-800'
+                  }`}>
+                    {loading ? 'CHECKING' : isOperational ? 'OPERATIONAL' : 'DOWN'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  Engine {systemStatus.version} • <span className={isOperational ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}>
+                    {loading ? 'Verifying...' : isOperational ? 'Spring Boot Active' : 'Backend Unreachable'}
+                  </span>
                 </p>
               </div>
             </div>
 
-            {/* Item 2 */}
-            <div className="flex items-start gap-3.5 p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 hover:bg-emerald-50 transition-colors">
-              <CheckCircle className="text-emerald-600 mt-0.5 shrink-0" size={20} />
-              <div>
-                <p className="font-bold text-slate-900 text-sm">GPS Emergency SOS</p>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Telemetry Stream <span className="text-emerald-700 font-bold">Active</span>
+            {/* Item 2: Database Status */}
+            <div className={`flex items-start gap-3.5 p-4 rounded-2xl border transition-colors ${
+              loading
+                ? 'bg-amber-50/70 border-amber-200/80'
+                : isDbConnected
+                ? 'bg-emerald-50/70 border-emerald-200/80 hover:bg-emerald-50'
+                : 'bg-rose-50/70 border-rose-200/80'
+            }`}>
+              <Database className={`mt-0.5 shrink-0 ${
+                loading ? 'text-amber-600' : isDbConnected ? 'text-emerald-600' : 'text-rose-600'
+              }`} size={20} />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-slate-900 text-sm">PostgreSQL Database</p>
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                    loading
+                      ? 'bg-amber-100 text-amber-800'
+                      : isDbConnected
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-rose-100 text-rose-800'
+                  }`}>
+                    {loading ? 'CHECKING' : isDbConnected ? 'CONNECTED' : 'DISCONNECTED'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  Port 5432 • <span className={isDbConnected ? 'text-emerald-700 font-bold' : 'text-rose-600 font-bold'}>
+                    {loading ? 'Querying...' : isDbConnected ? 'Live Connection OK' : 'Database Offline'}
+                  </span>
                 </p>
               </div>
             </div>
 
-            {/* Item 3 */}
-            <div className="flex items-start gap-3.5 p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 hover:bg-emerald-50 transition-colors">
-              <CheckCircle className="text-emerald-600 mt-0.5 shrink-0" size={20} />
-              <div>
-                <p className="font-bold text-slate-900 text-sm">Supply Chain Monitor</p>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  Inventory <span className="text-emerald-700 font-bold">Synced Real-Time</span>
+            {/* Item 3: Registered Hospitals */}
+            <div className="flex items-start gap-3.5 p-4 bg-blue-50/70 rounded-2xl border border-blue-200/80 hover:bg-blue-50 transition-colors">
+              <CheckCircle className="text-blue-600 mt-0.5 shrink-0" size={20} />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-slate-900 text-sm">Hospital Network</p>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                    {loading ? '...' : `${systemStatus.registeredHospitals} Verified`}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  {loading ? 'Loading registry...' : `${systemStatus.registeredHospitals} hospitals synced for emergency triage`}
                 </p>
               </div>
             </div>
 
-            {/* Item 4 */}
+            {/* Item 4: Emergency Dispatch Telemetry */}
             <div className="flex items-start gap-3.5 p-4 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 hover:bg-emerald-50 transition-colors">
               <CheckCircle className="text-emerald-600 mt-0.5 shrink-0" size={20} />
-              <div>
-                <p className="font-bold text-slate-900 text-sm">RAG Medical Assistant</p>
-                <p className="text-xs text-slate-600 mt-0.5">
-                  24/7 AI Triage <span className="text-emerald-700 font-bold">Ready</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-slate-900 text-sm">GPS Emergency SOS</p>
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    STANDBY
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  Telemetry Stream <span className="text-emerald-700 font-bold">Active</span> • Sub-3s Dispatch
                 </p>
               </div>
             </div>
@@ -1033,10 +1187,7 @@ function LandingFooter() {
 function LandingPage() {
   return (
     <div className="bg-white min-h-screen font-sans text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
-      {/* 1. Navbar */}
-      <Navbar />
-
-      {/* 2. Hero Section */}
+      {/* 1. Hero Section */}
       <HeroSection />
 
       {/* 3. System Status Dashboard */}

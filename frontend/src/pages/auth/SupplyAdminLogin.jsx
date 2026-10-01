@@ -18,28 +18,40 @@ function SupplyAdminLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('logistics@aura.med');
-  const [password, setPassword] = useState('supplypass123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (!username.trim() || !password.trim()) {
+      setErrorMsg('Please enter both username/email and password.');
+      return;
+    }
 
-    setTimeout(() => {
-      login(
-        {
-          id: 'supply-admin-01',
-          name: 'Marcus Brody',
-          email: email.trim(),
-          organization: 'Central Health Logistics Hub',
-        },
-        ROLES.SUPPLY_ADMIN
-      );
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      const res = await login(username, password);
+      if (res.success) {
+        if (res.role === ROLES.SUPPLY_ADMIN) {
+          navigate('/supply-chain');
+        } else if (res.role === ROLES.HOSPITAL_ADMIN) {
+          navigate('/hospital/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setErrorMsg(res.error || 'Invalid credentials or unauthorized role.');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'An error occurred during supply admin sign in.');
+    } finally {
       setLoading(false);
-      navigate('/supply-chain');
-    }, 400);
+    }
   };
 
   return (
@@ -80,18 +92,24 @@ function SupplyAdminLogin() {
             <span>Access is restricted to authorized healthcare supply personnel and logistics administrators.</span>
           </div>
 
+          {errorMsg && (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-semibold">
+              {errorMsg}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             
-            {/* Organization Email */}
+            {/* Organization Username or Email */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-700">Organization Email *</label>
+              <label className="font-bold text-slate-700">Username or Logistics Email *</label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="logistics@aura.med"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="logistics@aura.med or username"
                   required
                   className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 font-medium text-slate-800 bg-slate-50 focus:outline-none focus:border-teal-600 focus:bg-white"
                 />
@@ -133,10 +151,12 @@ function SupplyAdminLogin() {
 
           </form>
 
-          {/* Demo Hint Banner */}
-          <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-[11px] text-slate-500 space-y-1">
-            <span className="font-bold text-slate-700 block">Demo Supply Credentials:</span>
-            <p>Click "Authenticate Supply Admin" to enter Supply Chain Dashboard.</p>
+          {/* Registration Link */}
+          <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-600 font-medium">
+            Don't have a supply admin account?{' '}
+            <Link to="/signup/supply-admin" className="font-extrabold text-teal-700 hover:underline">
+              Register Supply Personnel
+            </Link>
           </div>
 
         </div>

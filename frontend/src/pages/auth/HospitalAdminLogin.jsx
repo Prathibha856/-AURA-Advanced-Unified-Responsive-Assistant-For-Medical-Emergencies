@@ -19,29 +19,41 @@ function HospitalAdminLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('r.vance@stjude.med');
-  const [password, setPassword] = useState('adminpass123');
-  const [hospitalId, setHospitalId] = useState('HOSP-101 (St. Jude Specialty)');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [hospitalId, setHospitalId] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    if (!username.trim() || !password.trim()) {
+      setErrorMsg('Please enter both administrator username/email and password.');
+      return;
+    }
 
-    setTimeout(() => {
-      login(
-        {
-          id: 'hosp-admin-01',
-          name: 'Dr. Robert Vance',
-          email: email.trim(),
-          hospital: hospitalId || 'St. Jude Specialty Hospital',
-        },
-        ROLES.HOSPITAL_ADMIN
-      );
+    setLoading(true);
+    setErrorMsg('');
+
+    try {
+      const res = await login(username, password);
+      if (res.success) {
+        if (res.role === ROLES.HOSPITAL_ADMIN) {
+          navigate('/hospital/dashboard');
+        } else if (res.role === ROLES.SUPPLY_ADMIN) {
+          navigate('/supply-chain');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setErrorMsg(res.error || 'Invalid credentials or unauthorized role.');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'An error occurred during hospital admin sign in.');
+    } finally {
       setLoading(false);
-      navigate('/hospital/dashboard');
-    }, 400);
+    }
   };
 
   return (
@@ -83,18 +95,24 @@ function HospitalAdminLogin() {
             <span>This area is restricted strictly to authorized hospital personnel and emergency operations staff.</span>
           </div>
 
+          {errorMsg && (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-semibold">
+              {errorMsg}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             
-            {/* Official Email */}
+            {/* Official Username or Email */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-700">Official Hospital Email *</label>
+              <label className="font-bold text-slate-700">Official Username or Email *</label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@hospital.med"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="admin@hospital.med or username"
                   required
                   className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 font-medium text-slate-800 bg-slate-50 focus:outline-none focus:border-slate-800 focus:bg-white"
                 />
@@ -103,7 +121,7 @@ function HospitalAdminLogin() {
 
             {/* Hospital Facility ID (Optional) */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-700">Hospital Facility Identifier</label>
+              <label className="font-bold text-slate-700">Hospital Facility Identifier (Optional)</label>
               <div className="relative">
                 <Building size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
@@ -151,10 +169,12 @@ function HospitalAdminLogin() {
 
           </form>
 
-          {/* Demo Hint Banner */}
-          <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl text-[11px] text-slate-500 space-y-1">
-            <span className="font-bold text-slate-700 block font-mono">Demo Admin Credentials:</span>
-            <p>Pre-filled for testing. Click "Authenticate Hospital Admin" to open Hospital Portal.</p>
+          {/* Registration Link */}
+          <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-600 font-medium">
+            Don't have an administrator account?{' '}
+            <Link to="/signup/hospital-admin" className="font-extrabold text-slate-900 hover:underline">
+              Register Facility Admin
+            </Link>
           </div>
 
         </div>

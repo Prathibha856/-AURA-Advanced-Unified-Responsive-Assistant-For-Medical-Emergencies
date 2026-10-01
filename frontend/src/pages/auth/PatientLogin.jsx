@@ -19,36 +19,41 @@ function PatientLogin() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('sarah.j@aura.med');
-  const [password, setPassword] = useState('password123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      setErrorMsg('Please enter both email and password.');
+    if (!username.trim() || !password.trim()) {
+      setErrorMsg('Please enter both username/email and password.');
       return;
     }
 
     setLoading(true);
     setErrorMsg('');
 
-    // Simulate mock authentication delay
-    setTimeout(() => {
-      login(
-        {
-          id: 'patient-001',
-          name: 'Sarah Jenkins',
-          email: email.trim(),
-        },
-        ROLES.PATIENT
-      );
+    try {
+      const res = await login(username, password);
+      if (res.success) {
+        if (res.role === ROLES.HOSPITAL_ADMIN) {
+          navigate('/hospital/dashboard');
+        } else if (res.role === ROLES.SUPPLY_ADMIN) {
+          navigate('/supply-chain');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        setErrorMsg(res.error || 'Invalid username or password.');
+      }
+    } catch (err) {
+      setErrorMsg(err.message || 'An error occurred during sign in.');
+    } finally {
       setLoading(false);
-      navigate('/patient/dashboard');
-    }, 400);
+    }
   };
 
   return (
@@ -96,16 +101,16 @@ function PatientLogin() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             
-            {/* Email Field */}
+            {/* Username Field */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-700">Patient Email Address</label>
+              <label className="font-bold text-slate-700">Username or Email</label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@aura.med"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="e.g. johndoe or user@aura.med"
                   required
                   className="w-full pl-9 pr-4 py-3 rounded-xl border border-slate-200 font-medium text-slate-800 bg-slate-50 focus:outline-none focus:border-blue-500 focus:bg-white"
                 />

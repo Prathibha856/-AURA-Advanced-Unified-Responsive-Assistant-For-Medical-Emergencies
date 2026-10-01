@@ -3,10 +3,10 @@
  * 
  * Configurable HTTP client designed to interface with the Spring Boot backend.
  * Base URL is read from Vite environment variable `VITE_API_BASE_URL`,
- * falling back to the standard local Spring Boot port (http://localhost:8080/api).
+ * falling back to the standard local Spring Boot port (http://localhost:8082/api).
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082/api';
 
 /**
  * Custom API Error class to wrap backend error payloads cleanly
@@ -37,8 +37,8 @@ export async function apiRequest(endpoint, options = {}) {
     'Accept': 'application/json',
   };
 
-  // Placeholder for Spring Boot JWT Bearer token injection
-  const token = sessionStorage.getItem('aura_auth_token');
+  // Spring Boot JWT Bearer token injection from localStorage
+  const token = localStorage.getItem('token') || sessionStorage.getItem('aura_auth_token');
   if (token) {
     defaultHeaders['Authorization'] = `Bearer ${token}`;
   }

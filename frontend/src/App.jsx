@@ -1,8 +1,11 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ROLES } from './config/roles';
 import ProtectedRoute from './components/ProtectedRoute';
-import Layout from './components/Layout';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import AuraChatWidget from './components/AuraChatWidget';
 
 // Core Pages
 import LandingPage from './pages/LandingPage';
@@ -18,7 +21,9 @@ import AuthPortal from './pages/auth/AuthPortal';
 import PatientLogin from './pages/auth/PatientLogin';
 import PatientSignup from './pages/auth/PatientSignup';
 import HospitalAdminLogin from './pages/auth/HospitalAdminLogin';
+import HospitalAdminSignup from './pages/auth/HospitalAdminSignup';
 import SupplyAdminLogin from './pages/auth/SupplyAdminLogin';
+import SupplyAdminSignup from './pages/auth/SupplyAdminSignup';
 
 // Protected Role Hubs
 import PatientDashboard from './pages/patient/PatientDashboard';
@@ -26,77 +31,158 @@ import PredictionResult from './pages/patient/PredictionResult';
 import MedicalInformation from './pages/patient/MedicalInformation';
 import HospitalDashboard from './pages/hospital/HospitalDashboard';
 
+/**
+ * PublicLayout: Clean layout without Navbar or persistent widgets for entry & auth flows
+ */
+function PublicLayout({ children }) {
+  return <>{children}</>;
+}
+
+/**
+ * AppLayout: Full application frame with role-based Navbar, Footer, and AuraChatWidget
+ */
+function AppLayout({ children }) {
+  return (
+    <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-800 relative">
+      <Navbar />
+      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {children}
+      </main>
+      <Footer />
+      <AuraChatWidget />
+    </div>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Layout>
-          <Routes>
-            {/* Public Entry & Navigation */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/access" element={<AccessPortal />} />
-            <Route path="/predict" element={<Predict />} />
-            <Route path="/prediction/result/:id" element={<PredictionResult />} />
-            <Route path="/hospitals" element={<Hospitals />} />
-            <Route path="/emergency" element={<Emergency />} />
-            <Route path="/chatbot" element={<Chatbot />} />
+        <Routes>
+          {/* ── Public Entry Routes (PublicLayout) ─────────────────────────── */}
+          <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
+          <Route path="/login" element={<PublicLayout><AuthPortal initialTab="login" /></PublicLayout>} />
+          <Route path="/register" element={<PublicLayout><AuthPortal initialTab="register" /></PublicLayout>} />
+          <Route path="/auth" element={<PublicLayout><AccessPortal /></PublicLayout>} />
+          <Route path="/access" element={<PublicLayout><AccessPortal /></PublicLayout>} />
+          
+          <Route path="/login/patient" element={<PublicLayout><PatientLogin /></PublicLayout>} />
+          <Route path="/signup/patient" element={<PublicLayout><PatientSignup /></PublicLayout>} />
+          
+          <Route path="/login/hospital-admin" element={<PublicLayout><HospitalAdminLogin /></PublicLayout>} />
+          <Route path="/signup/hospital-admin" element={<PublicLayout><HospitalAdminSignup /></PublicLayout>} />
+          
+          <Route path="/login/supply-admin" element={<PublicLayout><SupplyAdminLogin /></PublicLayout>} />
+          <Route path="/signup/supply-admin" element={<PublicLayout><SupplyAdminSignup /></PublicLayout>} />
 
-            {/* Authentication Entry Routes */}
-            <Route path="/auth" element={<AuthPortal />} />
-            <Route path="/login" element={<AuthPortal initialTab="login" />} />
-            <Route path="/register" element={<AuthPortal initialTab="register" />} />
-            <Route path="/login/patient" element={<PatientLogin />} />
-            <Route path="/signup/patient" element={<PatientSignup />} />
-            <Route path="/login/hospital-admin" element={<HospitalAdminLogin />} />
-            <Route path="/login/supply-admin" element={<SupplyAdminLogin />} />
+          {/* ── Authenticated Routes (AppLayout + ProtectedRoute) ─────────── */}
+          {/* Patient Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <AppLayout><PatientDashboard /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <AppLayout><PatientDashboard /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/medical-info"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <AppLayout><MedicalInformation /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/medical-information"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <AppLayout><MedicalInformation /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient/prediction-result"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <AppLayout><PredictionResult /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/prediction/result/:id"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
+                <AppLayout><PredictionResult /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
 
-            {/* Role 1: PATIENT Protected Routes */}
-            <Route
-              path="/patient/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={[ROLES.PATIENT]} redirectTo="/access">
-                  <PatientDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patient-dashboard"
-              element={
-                <ProtectedRoute allowedRoles={[ROLES.PATIENT]} redirectTo="/access">
-                  <PatientDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patient/medical-information"
-              element={
-                <ProtectedRoute allowedRoles={[ROLES.PATIENT]} redirectTo="/access">
-                  <MedicalInformation />
-                </ProtectedRoute>
-              }
-            />
+          {/* Shared Clinical Services */}
+          <Route
+            path="/predict"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT, ROLES.HOSPITAL_ADMIN]}>
+                <AppLayout><Predict /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/emergency"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT, ROLES.HOSPITAL_ADMIN, ROLES.SUPPLY_ADMIN]}>
+                <AppLayout><Emergency /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hospitals"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT, ROLES.HOSPITAL_ADMIN, ROLES.SUPPLY_ADMIN]}>
+                <AppLayout><Hospitals /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chatbot"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT, ROLES.HOSPITAL_ADMIN]}>
+                <AppLayout><Chatbot /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
 
-            {/* Role 2: HOSPITAL_ADMIN Protected Routes */}
-            <Route
-              path="/hospital/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={[ROLES.HOSPITAL_ADMIN]} redirectTo="/access">
-                  <HospitalDashboard />
-                </ProtectedRoute>
-              }
-            />
+          {/* Hospital Administrator Routes */}
+          <Route
+            path="/hospital/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.HOSPITAL_ADMIN]}>
+                <AppLayout><HospitalDashboard /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
 
-            {/* Role 3: SUPPLY_ADMIN Protected Routes */}
-            <Route
-              path="/supply-chain"
-              element={
-                <ProtectedRoute allowedRoles={[ROLES.SUPPLY_ADMIN, ROLES.HOSPITAL_ADMIN]} redirectTo="/access">
-                  <SupplyChain />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Layout>
+          {/* Supply Chain Admin Routes */}
+          <Route
+            path="/supply-chain"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.SUPPLY_ADMIN, ROLES.HOSPITAL_ADMIN]}>
+                <AppLayout><SupplyChain /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </Router>
     </AuthProvider>
   );

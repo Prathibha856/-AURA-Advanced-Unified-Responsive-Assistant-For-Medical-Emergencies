@@ -42,7 +42,7 @@ public class Config {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints — no token required
-                        .requestMatchers("/api/auth/**", "/").permitAll()
+                        .requestMatchers("/api/auth/**", "/", "/api/system/status").permitAll()
 
 
                         // Lock down hospital modification routes to admins only
@@ -81,7 +81,7 @@ public class Config {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://localhost:5173", "*"));
+        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://localhost:5174"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
