@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,7 +45,6 @@ public class Config {
                         // Public endpoints — no token required
                         .requestMatchers("/api/auth/**", "/", "/api/system/status").permitAll()
 
-
                         // Lock down hospital modification routes to admins only
                         .requestMatchers(HttpMethod.POST, "/api/hospitals/**").hasAuthority("HOSPITAL_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/hospitals/**").hasAuthority("HOSPITAL_ADMIN")
@@ -54,11 +54,9 @@ public class Config {
                         .requestMatchers(HttpMethod.GET, "/api/hospitals/**").authenticated()
 
                         // All other endpoints require a valid JWT
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 // Stateless: no HTTP sessions, authentication is per-request via JWT
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // JWT filter runs before Spring's default username/password filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -78,10 +76,23 @@ public class Config {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:5174","http://localhost:5714", "http://127.0.0.1:5173","http://127.0.0.1:5714"));
+        configuration.setAllowedOriginPatterns(
+                List.of(
+                        "http://localhost:3000",
+                        "http://localhost:5173",
+                        "http://localhost:5174",
+                        "http://localhost:5714",
+                        "http://127.0.0.1:5173",
+                        "http://127.0.0.1:5714"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
