@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,6 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@EnableMethodSecurity
 public class Config {
 
     @Autowired
@@ -52,6 +54,11 @@ public class Config {
 
                         // Allow all authenticated users (including patients) to view hospitals
                         .requestMatchers(HttpMethod.GET, "/api/hospitals/**").authenticated()
+
+                        // Supply chain — SUPPLY_ADMIN and HOSPITAL_ADMIN only (method-level @PreAuthorize refines further)
+                        .requestMatchers("/api/supply/**").hasAnyAuthority("SUPPLY_ADMIN", "HOSPITAL_ADMIN")
+                        .requestMatchers("/api/inventory/**").hasAnyAuthority("SUPPLY_ADMIN", "HOSPITAL_ADMIN")
+                        .requestMatchers("/api/admin/supply/**").hasAnyAuthority("SUPPLY_ADMIN", "HOSPITAL_ADMIN")
 
                         // All other endpoints require a valid JWT
                         .anyRequest().authenticated())

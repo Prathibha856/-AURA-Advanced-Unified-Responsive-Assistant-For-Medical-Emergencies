@@ -31,13 +31,13 @@ public class TwilioService {
     @Value("${twilio.phone-number}")
     private String twilioPhoneNumber;
 
-    @Value("${twilio.enabled:false}")
+    @Value("${twilio.enabled:true}")
     private boolean enabled;
 
     @jakarta.annotation.PostConstruct
     public void logConfig() {
         log.info("╔══════════════════════════════════════════════════════════╗");
-        log.info("║  TwilioService Configuration at Startup                 ║");
+        log.info("║  TwilioService Configuration at Startup                  ║");
         log.info("║  enabled       = {}                                     ", enabled);
         log.info("║  phoneNumber   = [{}]                                   ", twilioPhoneNumber);
         log.info("╚══════════════════════════════════════════════════════════╝");
@@ -57,12 +57,10 @@ public class TwilioService {
      * @param longitude      Patient's longitude
      */
     @Async
-    public void makeEmergencyCall(String hospitalPhone, String patientName,
-                                  Integer alertId, Double latitude, Double longitude) {
+    public void makeEmergencyCall(String hospitalPhone, String patientName, Integer alertId, Double latitude, Double longitude) {
 
         if (!enabled) {
-            log.info("[TWILIO DISABLED] Would have called {} for alert #{}",
-                    hospitalPhone, alertId);
+            log.info("[TWILIO DISABLED] Would have called {} for alert #{}", hospitalPhone, alertId);
             return;
         }
 
