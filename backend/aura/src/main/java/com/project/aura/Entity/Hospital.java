@@ -1,5 +1,8 @@
 package com.project.aura.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Hospital {
 
     @Id
@@ -17,9 +21,22 @@ public class Hospital {
     @Column(name = "hospital_id")
     private Integer hospitalId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_user_id")
     private Users adminUser;
+
+    @JsonProperty("adminUserId")
+    public Integer getAdminUserId() {
+        if (adminUser == null) {
+            return null;
+        }
+        try {
+            return adminUser.getUserid();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     @Column(name = "name", nullable = false)
     private String name;

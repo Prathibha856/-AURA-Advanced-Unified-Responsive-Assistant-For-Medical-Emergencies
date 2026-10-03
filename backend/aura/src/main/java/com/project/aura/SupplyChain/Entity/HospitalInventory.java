@@ -1,5 +1,6 @@
 package com.project.aura.SupplyChain.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.project.aura.Entity.Hospital;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HospitalInventory {
 
     @Id

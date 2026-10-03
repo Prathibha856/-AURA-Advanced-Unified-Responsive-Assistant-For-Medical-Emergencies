@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
  * partial updates or negative stock.
  */
 @Service
+@Transactional(readOnly = true)
 public class SupplyChainService {
 
     private static final Logger log = LoggerFactory.getLogger(SupplyChainService.class);

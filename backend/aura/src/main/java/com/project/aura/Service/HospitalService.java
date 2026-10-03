@@ -22,12 +22,14 @@ public class HospitalService {
     @Autowired
     private UserRepo userRepo;
 
+    @Transactional
     public List<HospitalDTO> getAllHospitals() {
         return hospitalRepo.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public HospitalDTO getHospitalById(Integer id) {
         return toDTO(hospitalRepo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hospital not found: " + id)));
@@ -95,7 +97,7 @@ public class HospitalService {
                 .latitude(h.getLatitude())
                 .longitude(h.getLongitude())
                 .phone(h.getPhone())
-                .adminUserId(h.getAdminUser() != null ? h.getAdminUser().getUserid() : null)
+                .adminUserId(h.getAdminUserId())
                 .build();
     }
 }

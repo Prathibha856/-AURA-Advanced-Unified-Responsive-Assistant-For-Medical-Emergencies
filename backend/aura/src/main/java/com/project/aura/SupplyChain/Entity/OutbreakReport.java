@@ -1,5 +1,6 @@
 package com.project.aura.SupplyChain.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.project.aura.Entity.Hospital;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class OutbreakReport {
 
     @Id
