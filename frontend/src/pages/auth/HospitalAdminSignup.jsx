@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ROLES } from '../../config/roles';
 import {
@@ -12,11 +12,11 @@ import {
   ArrowRight,
   ArrowLeft,
   AlertCircle,
+  CheckCircle2,
   ShieldAlert
 } from 'lucide-react';
 
 function HospitalAdminSignup() {
-  const navigate = useNavigate();
   const { register } = useAuth();
 
   const [username, setUsername] = useState('');
@@ -26,6 +26,7 @@ function HospitalAdminSignup() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -63,13 +64,12 @@ function HospitalAdminSignup() {
 
     setLoading(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
       const res = await register(username.trim(), email.trim(), password, ROLES.HOSPITAL_ADMIN);
       if (res.success) {
-        navigate('/login', {
-          state: { message: 'Hospital administrator account registered! Please sign in.' },
-        });
+        setSuccessMsg(res.message || 'Registration successful, login again to access dashboard');
       } else {
         setErrorMsg(res.error || 'Registration failed. Username or email may already exist.');
       }
@@ -117,6 +117,13 @@ function HospitalAdminSignup() {
             <ShieldAlert size={18} className="text-amber-600 shrink-0 mt-0.5" />
             <span>Registration grants access to emergency triage telemetry and bed management.</span>
           </div>
+
+          {successMsg && (
+            <div className="bg-green-50 border border-green-300 text-green-800 p-3 rounded-xl text-xs font-semibold flex items-center gap-2">
+              <CheckCircle2 size={16} className="shrink-0 text-green-600" />
+              <span>{successMsg}</span>
+            </div>
+          )}
 
           {errorMsg && (
             <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs font-semibold flex items-center gap-2">

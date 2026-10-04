@@ -17,7 +17,6 @@ import Hospitals from './pages/Hospitals';
 
 // Auth Experience Pages
 import AccessPortal from './pages/auth/AccessPortal';
-import AuthPortal from './pages/auth/AuthPortal';
 import PatientLogin from './pages/auth/PatientLogin';
 import PatientSignup from './pages/auth/PatientSignup';
 import HospitalAdminLogin from './pages/auth/HospitalAdminLogin';
@@ -61,8 +60,8 @@ function App() {
         <Routes>
           {/* ── Public Entry Routes (PublicLayout) ─────────────────────────── */}
           <Route path="/" element={<PublicLayout><LandingPage /></PublicLayout>} />
-          <Route path="/login" element={<PublicLayout><AuthPortal initialTab="login" /></PublicLayout>} />
-          <Route path="/register" element={<PublicLayout><AuthPortal initialTab="register" /></PublicLayout>} />
+          <Route path="/login" element={<Navigate to="/access" replace />} />
+          <Route path="/register" element={<Navigate to="/access" replace />} />
           <Route path="/auth" element={<PublicLayout><AccessPortal /></PublicLayout>} />
           <Route path="/access" element={<PublicLayout><AccessPortal /></PublicLayout>} />
           

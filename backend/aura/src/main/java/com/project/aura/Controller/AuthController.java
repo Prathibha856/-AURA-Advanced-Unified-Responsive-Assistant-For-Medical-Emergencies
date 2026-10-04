@@ -3,7 +3,7 @@ package com.project.aura.Controller;
 import com.project.aura.DTO.AuthResponse;
 import com.project.aura.DTO.LoginRequest;
 import com.project.aura.DTO.RegisterRequest;
-import com.project.aura.Entity.Users;
+import com.project.aura.DTO.RegisterResponse;
 import com.project.aura.Service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +19,14 @@ public class AuthController {
     /**
      * POST /api/auth/register
      * Body: { "username": "...", "email": "...", "password": "...", "role": "PATIENT" }
+     * Returns: { "message": "Registration successful, login again to access dashboard" }
      */
     @PostMapping("/register")
-    public ResponseEntity<String> newRegister(@RequestBody RegisterRequest registerRequest) {
-        Users savedUser = registerService.newRegister(registerRequest);
-        return ResponseEntity.ok("User registered successfully with ID: " + savedUser.getUserid());
+    public ResponseEntity<RegisterResponse> newRegister(@RequestBody RegisterRequest registerRequest) {
+        registerService.newRegister(registerRequest);
+        return ResponseEntity.ok(
+            new RegisterResponse("Registration successful, login again to access dashboard")
+        );
     }
 
     /**

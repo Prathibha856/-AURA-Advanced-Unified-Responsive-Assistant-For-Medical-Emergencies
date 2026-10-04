@@ -120,7 +120,7 @@ export function AuthProvider({ children }) {
 
       return {
         success: true,
-        message: typeof response === 'string' ? response : 'Registration successful! Please log in.',
+        message: (response && response.message) ? response.message : 'Registration successful! Please log in.',
       };
     } catch (error) {
       const errorMessage =
