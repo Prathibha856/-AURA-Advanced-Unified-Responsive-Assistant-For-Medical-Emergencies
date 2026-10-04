@@ -9,7 +9,21 @@ venv/
 # Large data files (regenerable)
 knowledge_base/medical_qa.json
 knowledge_base/medquad_embeddings.json
+knowledge_base/bm25_index.pkl
 chroma_db/
+
+# Trained models (regenerable)
+models/*.pkl
+models/*.bin
+models/*.pt
+
+# Evaluation results (regenerable)
+evaluation/results/
+evaluation/*.json
+
+# Backups
+rag_agent_backup.py
+*.backup
 
 # Environment
 .env
@@ -17,3 +31,4 @@ chroma_db/
 
 # Misc
 request.json
+.DS_Store

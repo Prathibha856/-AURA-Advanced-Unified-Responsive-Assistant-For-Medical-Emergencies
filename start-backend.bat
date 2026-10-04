@@ -16,3 +16,4 @@ if %ERRORLEVEL% NEQ 0 (
 echo [2/2] Launching Spring Boot Backend on port 8082...
 cd /d "%~dp0backend\aura"
 mvn spring-boot:run "-Djava.version=21"
+
