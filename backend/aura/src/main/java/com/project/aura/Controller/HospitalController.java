@@ -28,6 +28,16 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalService.getHospitalById(id));
     }
 
+    /**
+     * GET /api/hospitals/admin/{userId}
+     * Returns the hospital record associated with the given admin user ID.
+     * Used by HOSPITAL_ADMIN to discover their own hospitalId from their JWT userId.
+     */
+    @GetMapping("/admin/{userId}")
+    public ResponseEntity<HospitalDTO> getHospitalByAdminUserId(@PathVariable Integer userId) {
+        return ResponseEntity.ok(hospitalService.getHospitalByAdminUserId(userId));
+    }
+
     /** POST /api/hospitals */
     @PostMapping
     public ResponseEntity<HospitalDTO> createHospital(@RequestBody HospitalDTO dto) {

@@ -29,6 +29,7 @@ import PatientDashboard from './pages/patient/PatientDashboard';
 import PredictionResult from './pages/patient/PredictionResult';
 import MedicalInformation from './pages/patient/MedicalInformation';
 import HospitalDashboard from './pages/hospital/HospitalDashboard';
+import HospitalSOSAlerts from './pages/hospital/HospitalSOSAlerts';
 
 /**
  * PublicLayout: Clean layout without Navbar or persistent widgets for entry & auth flows
@@ -64,13 +65,13 @@ function App() {
           <Route path="/register" element={<Navigate to="/access" replace />} />
           <Route path="/auth" element={<PublicLayout><AccessPortal /></PublicLayout>} />
           <Route path="/access" element={<PublicLayout><AccessPortal /></PublicLayout>} />
-          
+
           <Route path="/login/patient" element={<PublicLayout><PatientLogin /></PublicLayout>} />
           <Route path="/signup/patient" element={<PublicLayout><PatientSignup /></PublicLayout>} />
-          
+
           <Route path="/login/hospital-admin" element={<PublicLayout><HospitalAdminLogin /></PublicLayout>} />
           <Route path="/signup/hospital-admin" element={<PublicLayout><HospitalAdminSignup /></PublicLayout>} />
-          
+
           <Route path="/login/supply-admin" element={<PublicLayout><SupplyAdminLogin /></PublicLayout>} />
           <Route path="/signup/supply-admin" element={<PublicLayout><SupplyAdminSignup /></PublicLayout>} />
 
@@ -137,8 +138,16 @@ function App() {
           <Route
             path="/emergency"
             element={
-              <ProtectedRoute allowedRoles={[ROLES.PATIENT, ROLES.HOSPITAL_ADMIN, ROLES.SUPPLY_ADMIN]}>
+              <ProtectedRoute allowedRoles={[ROLES.PATIENT]}>
                 <AppLayout><Emergency /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/hospital/sos-alerts"
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.HOSPITAL_ADMIN]}>
+                <AppLayout><HospitalSOSAlerts /></AppLayout>
               </ProtectedRoute>
             }
           />

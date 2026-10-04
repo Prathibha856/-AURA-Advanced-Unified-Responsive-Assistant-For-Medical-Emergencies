@@ -35,6 +35,19 @@ public class HospitalService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hospital not found: " + id)));
     }
 
+    /**
+     * Returns the hospital managed by the given admin user.
+     * Enables HOSPITAL_ADMIN users to look up their hospital using their JWT
+     * userId.
+     */
+    @Transactional
+    public HospitalDTO getHospitalByAdminUserId(Integer userId) {
+        Hospital hospital = hospitalRepo.findByAdminUser_Userid(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No hospital found for admin user ID: " + userId));
+        return toDTO(hospital);
+    }
+
     public HospitalDTO createHospital(HospitalDTO dto) {
         Hospital hospital = Hospital.builder()
                 .name(dto.getName())
@@ -91,7 +104,7 @@ public class HospitalService {
 
     public HospitalDTO toDTO(Hospital h) {
         return HospitalDTO.builder()
-//                .hospitalId(h.getHospitalId())
+                .hospitalId(h.getHospitalId())
                 .name(h.getName())
                 .address(h.getAddress())
                 .latitude(h.getLatitude())

@@ -64,7 +64,7 @@ function Navbar() {
   } else if (activeRole === ROLES.HOSPITAL_ADMIN) {
     navLinks = [
       { path: '/hospital/dashboard', label: 'Hospital Dashboard', icon: Building2 },
-      { path: '/emergency', label: 'SOS Alerts', icon: Bell },
+      { path: '/hospital/sos-alerts', label: 'SOS Alerts', icon: Bell },
       { path: '/supply-chain', label: 'Supply Overview', icon: Package },
     ];
   } else if (activeRole === ROLES.SUPPLY_ADMIN) {

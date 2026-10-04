@@ -305,7 +305,7 @@ public class SosService {
         if (a.getHospital() != null) {
             Hospital h = a.getHospital();
             hospitalDTO = HospitalDTO.builder()
-//                    .hospitalId(h.getHospitalId())
+                    .hospitalId(h.getHospitalId())
                     .name(h.getName())
                     .address(h.getAddress())
                     .latitude(h.getLatitude())
