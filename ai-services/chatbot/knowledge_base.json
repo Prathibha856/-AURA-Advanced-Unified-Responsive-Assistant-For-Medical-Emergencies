@@ -1,0 +1,251 @@
+{
+  "system": "AURA Medical Emergency and Disease Prediction Knowledge Base",
+  "version": "2.0.0",
+  "disclaimer": "AURA provides evidence-based clinical risk estimates and triage support for educational and emergency response purposes. It does not replace professional medical diagnosis, laboratory testing, or physician consultation.",
+  "diseases": [
+    {
+      "id": "hypothyroidism",
+      "name": "Hypothyroidism",
+      "category": "Thyroid Dysfunction",
+      "icd10": "E03.9",
+      "definition": "A clinical syndrome resulting from deficiency of thyroid hormones (thyroxine T4 and triiodothyronine T3), leading to generalized metabolic slowing.",
+      "clinical_thresholds": {
+        "source": "American Thyroid Association (ATA) / European Thyroid Association (ETA)",
+        "tsh": "> 4.5 mIU/L",
+        "ft4": "< 0.8 ng/dL (10 pmol/L)",
+        "clinical_note": "Elevated TSH with subnormal Free T4 defines overt primary hypothyroidism."
+      },
+      "common_symptoms": [
+        "Chronic fatigue and lethargy",
+        "Cold intolerance",
+        "Unexplained weight gain",
+        "Constipation",
+        "Dry skin and coarse, thinning hair",
+        "Bradycardia (low heart rate)",
+        "Depression and cognitive slowing ('brain fog')"
+      ],
+      "risk_factors": [
+        "Female sex (5-8x higher prevalence)",
+        "Age > 60 years",
+        "Personal or family history of autoimmune disorders (e.g., Hashimoto's thyroiditis, Type 1 Diabetes)",
+        "Prior thyroid surgery or radioiodine therapy",
+        "Postpartum status"
+      ],
+      "emergency_red_flags": [
+        "Myxedema coma: severe hypothermia, marked bradycardia, altered mental status, hypoventilation, hypotension",
+        "Immediate emergency dispatch (112 / 108 / 911) required if unresponsiveness or stupor occurs."
+      ],
+      "clinical_management": [
+        "First-line replacement therapy: Levothyroxine (LT4) oral administration",
+        "Target TSH normalization between 0.5 and 2.5 mIU/L in young adults",
+        "Routine re-testing every 6 to 12 weeks during dose titration"
+      ]
+    },
+    {
+      "id": "hyperthyroidism",
+      "name": "Hyperthyroidism",
+      "category": "Thyroid Dysfunction",
+      "icd10": "E05.9",
+      "definition": "A hypermetabolic clinical state resulting from excessive production and secretion of thyroid hormones by the thyroid gland (most commonly Graves' disease or toxic multinodular goitre).",
+      "clinical_thresholds": {
+        "source": "American Thyroid Association (ATA)",
+        "tsh": "< 0.4 mIU/L",
+        "ft4": "> 1.8 ng/dL (23 pmol/L)",
+        "clinical_note": "Suppressed TSH with elevated Free T4 / Free T3 defines overt thyrotoxicosis."
+      },
+      "common_symptoms": [
+        "Palpitations and tachycardia (resting heart rate > 100 bpm)",
+        "Unexplained weight loss despite increased appetite",
+        "Heat intolerance and profuse sweating",
+        "Tremor in hands and fingers",
+        "Anxiety, irritability, and insomnia",
+        "Frequent bowel movements or diarrhea",
+        "Exophthalmos (bulging eyes in Graves' disease)"
+      ],
+      "risk_factors": [
+        "Female sex",
+        "Graves' disease autoimmune history",
+        "High dietary iodine or amiodarone medication",
+        "Family history of thyroid storm or thyrotoxicosis"
+      ],
+      "emergency_red_flags": [
+        "Thyroid Storm: life-threatening hyperpyrexia (> 40°C / 104°F), extreme tachycardia, atrial fibrillation, delirium, cardiovascular collapse",
+        "Immediate ICU hospitalization required."
+      ],
+      "clinical_management": [
+        "Antithyroid medications: Methimazole or Propylthiouracil (PTU)",
+        "Beta-blockers (e.g., Propranolol) for acute symptomatic rate control",
+        "Definitive options: Radioactive Iodine (I-131) ablation or thyroidectomy"
+      ]
+    },
+    {
+      "id": "subclinical_thyroid",
+      "name": "Subclinical Thyroid Dysfunction",
+      "category": "Thyroid Dysfunction",
+      "icd10": "E02",
+      "definition": "An asymptomatic or mildly symptomatic biochemical state characterized by abnormal serum TSH concentrations accompanied by circulating Free T4 and Free T3 within reference ranges.",
+      "clinical_thresholds": {
+        "source": "American Thyroid Association / ETA Consensus Guidelines",
+        "subclinical_hypo": "TSH > 4.5 mIU/L AND FT4 between 0.8 - 1.8 ng/dL",
+        "subclinical_hyper": "TSH < 0.4 mIU/L AND FT4 between 0.8 - 1.8 ng/dL",
+        "clinical_note": "Requires confirmatory repeat panel in 2-3 months before initiating pharmacotherapy."
+      },
+      "common_symptoms": [
+        "Mild fatigue or subclinical mood changes",
+        "Subtle lipid profile abnormalities (mild hypercholesterolemia)",
+        "Often completely asymptomatic and detected on routine wellness screens"
+      ],
+      "risk_factors": [
+        "Advanced age (> 65 years)",
+        "Positive anti-TPO (thyroid peroxidase) autoantibodies",
+        "History of neck radiation therapy"
+      ],
+      "emergency_red_flags": [
+        "Progression to overt failure or precipitation into arrhythmia if untreated with severe cardiovascular comorbidities"
+      ],
+      "clinical_management": [
+        "Watchful surveillance with serial TSH/FT4 every 3-6 months",
+        "Consider low-dose levothyroxine if TSH > 10 mIU/L or high cardiovascular risk"
+      ]
+    },
+    {
+      "id": "iron_deficiency_anemia",
+      "name": "Iron Deficiency Anemia (IDA)",
+      "category": "Nutritional / Hematological Deficiency",
+      "icd10": "D50.9",
+      "definition": "Microcytic, hypochromic anemia caused by inadequate total body iron stores to support erythropoiesis.",
+      "clinical_thresholds": {
+        "source": "World Health Organization (WHO) Guidelines",
+        "hemoglobin_female": "< 12.0 g/dL (non-pregnant)",
+        "hemoglobin_male": "< 13.0 g/dL",
+        "mcv": "< 80.0 fL (microcytosis)",
+        "serum_ferritin": "< 15 - 30 ng/mL"
+      },
+      "common_symptoms": [
+        "Exertional fatigue and general pallor (pale conjunctiva and nail beds)",
+        "Shortness of breath on mild exertion",
+        "Dizziness, lightheadedness, and cephalalgia",
+        "Cold hands and feet",
+        "Brittle spoon-shaped nails (koilonychia) and pica (craving ice/dirt)"
+      ],
+      "risk_factors": [
+        "Menstruating and pregnant women",
+        "Chronic occult gastrointestinal blood loss (ulcers, polyps, colorectal lesions)",
+        "Vegetarian or vegan diets lacking bioavailable heme iron",
+        "Malabsorption syndromes (Celiac disease, post-gastric bypass)"
+      ],
+      "emergency_red_flags": [
+        "Severe acute anemia: Hemoglobin < 7.0 g/dL accompanied by hemodynamic instability, chest pain (angina pectoris), syncope, or resting dyspnea",
+        "Urgent blood transfusion and hospital admission required."
+      ],
+      "clinical_management": [
+        "Oral iron salts (Ferrous sulfate / fumarate / bisglycinate) taken with Vitamin C",
+        "Intravenous iron sucrose/carboxymaltose for refractory cases or severe malabsorption",
+        "Mandatory diagnostic workup for gastrointestinal source in adult males and postmenopausal females"
+      ]
+    },
+    {
+      "id": "vitamin_b12_deficiency",
+      "name": "Vitamin B12 Deficiency",
+      "category": "Nutritional / Neurological Deficiency",
+      "icd10": "E53.8",
+      "definition": "A nutritional deficiency of cobalamin essential for DNA synthesis and myelin sheath integrity, resulting in megaloblastic anemia and irreversible neuropathy.",
+      "clinical_thresholds": {
+        "source": "WHO / CDC Laboratory Diagnostic Guidelines",
+        "serum_b12": "< 200 pg/mL (148 pmol/L)",
+        "borderline": "200 - 300 pg/mL (confirm with methylmalonic acid / homocysteine)",
+        "mcv": "> 100 fL (macrocytosis, often present but can be masked by concurrent iron deficiency)"
+      },
+      "common_symptoms": [
+        "Peripheral neuropathy: symmetrical numbness, tingling, or 'pins and needles' in hands and feet",
+        "Subacute combined degeneration: gait ataxia, loss of proprioception and vibratory sense",
+        "Glossitis (smooth, beefy red tongue)",
+        "Megaloblastic anemia fatigue and pale jaundice (lemon-yellow skin hue)",
+        "Neuropsychiatric symptoms: memory loss, confusion, paranoia, depression"
+      ],
+      "risk_factors": [
+        "Strict vegan or vegetarian diets without supplementation",
+        "Pernicious anemia (anti-intrinsic factor antibodies)",
+        "Chronic Metformin or Proton Pump Inhibitor (PPI) pharmacotherapy",
+        "Atrophic gastritis and elderly age"
+      ],
+      "emergency_red_flags": [
+        "Acute ataxia, inability to walk, severe confusion, or progressive motor paresis",
+        "Irreversible neurological damage occurs if B12 treatment is delayed."
+      ],
+      "clinical_management": [
+        "Intramuscular cyanocobalamin / hydroxocobalamin injections (1000 mcg)",
+        "High-dose oral cobalamin (1000-2000 mcg/day) for maintenance",
+        "Never administer folate alone before ruling out B12 deficiency (prevents subacute cord degeneration mask)"
+      ]
+    },
+    {
+      "id": "folate_deficiency",
+      "name": "Folate (Vitamin B9) Deficiency",
+      "category": "Nutritional / Hematological Deficiency",
+      "icd10": "E53.8",
+      "definition": "Depletion of body folate stores required for one-carbon metabolism, RNA/DNA synthesis, and red blood cell maturation.",
+      "clinical_thresholds": {
+        "source": "World Health Organization (WHO) Technical Consultation",
+        "serum_folate": "< 4.0 ng/mL (10 nmol/L)",
+        "rbc_folate": "< 151 ng/mL (340 nmol/L) (indicates long-term tissue depletion)",
+        "clinical_note": "Associated with elevated homocysteine but normal methylmalonic acid (MMA)."
+      },
+      "common_symptoms": [
+        "Megaloblastic anemia symptoms: severe exhaustion, pallor, shortness of breath",
+        "Oral aphthous ulcers and sore tongue (stomatitis)",
+        "Mild gastrointestinal disturbances and weight loss",
+        "Unlike B12 deficiency, prominent peripheral sensory neuropathy is ABSENT."
+      ],
+      "risk_factors": [
+        "Insufficient intake of leafy greens, citrus, and fortified grains",
+        "Chronic alcohol use disorder (inhibits enterohepatic circulation)",
+        "Pregnancy and lactation (dramatically increased fetal neural tube demands)",
+        "Antifolate medications (Methotrexate, Trimethoprim, Phenytoin)"
+      ],
+      "emergency_red_flags": [
+        "Neural tube defect risk (spina bifida / anencephaly) in pregnant mothers with severe deficiency",
+        "Critical severe anemia requiring blood product resuscitation"
+      ],
+      "clinical_management": [
+        "Oral folic acid supplementation: 1 - 5 mg daily",
+        "Dietary counseling: dark leafy greens (spinach, kale), legumes, citrus fruits",
+        "Mandatory 400 - 800 mcg/day periconceptional supplementation for women of childbearing age"
+      ]
+    },
+    {
+      "id": "vitamin_d_deficiency",
+      "name": "Vitamin D Deficiency",
+      "category": "Nutritional / Skeletal Deficiency",
+      "icd10": "E55.9",
+      "definition": "Insufficient circulating levels of 25-hydroxyvitamin D [25(OH)D], impairing intestinal calcium/phosphate absorption and bone mineral homeostasis.",
+      "clinical_thresholds": {
+        "source": "Endocrine Society Clinical Practice Guidelines",
+        "deficient": "< 20.0 ng/mL (50 nmol/L)",
+        "insufficient": "20.0 - 29.9 ng/mL (50 - 75 nmol/L)",
+        "sufficient": "30.0 - 100.0 ng/mL (75 - 250 nmol/L)"
+      },
+      "common_symptoms": [
+        "Diffuse bone pain and skeletal tenderness (especially ribs, hips, tibia)",
+        "Proximal muscle weakness and difficulty climbing stairs or standing from chairs",
+        "Increased susceptibility to respiratory tract infections",
+        "Chronic bone loss, osteoporosis, and fragility fractures in adults; rickets in children"
+      ],
+      "risk_factors": [
+        "Limited sunlight exposure (high latitude, indoor occupations, sun-protective clothing)",
+        "Deeply pigmented skin (melanin absorbs UV-B photons)",
+        "Obesity (BMI > 30 kg/m², sequestration in adipose stores)",
+        "Chronic kidney or liver disease (impaired 1-alpha-hydroxylation)"
+      ],
+      "emergency_red_flags": [
+        "Severe hypocalcemia secondary to profound deficiency: tetany, laryngospasm, carpopedal spasms, cardiac QT-prolongation and ventricular arrhythmias",
+        "Immediate IV calcium gluconate and telemetry required."
+      ],
+      "clinical_management": [
+        "High-dose ergocalciferol (Vitamin D2) or cholecalciferol (Vitamin D3): 50,000 IU weekly for 8 weeks",
+        "Maintenance therapy: 1,500 - 2,000 IU daily",
+        "Adequate elemental calcium intake (1,000 - 1,200 mg daily)"
+      ]
+    }
+  ]
+}
