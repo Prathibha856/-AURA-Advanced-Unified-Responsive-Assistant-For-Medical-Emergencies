@@ -51,3 +51,6 @@ desktop.ini
 # Misc
 *.log
 *.tmp
+# Chatbot data (available on GitHub Releases)
+ai-services/chatbot_data.zip
+ai-services/chatbot_data_export/
