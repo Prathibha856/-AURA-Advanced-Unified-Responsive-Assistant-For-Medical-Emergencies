@@ -32,3 +32,6 @@ rag_agent_backup.py
 # Misc
 request.json
 .DS_Store
+# Data export (available via GitHub Releases)
+chatbot_data.zip
+chatbot_data_export/
