@@ -1,0 +1,32 @@
+# ==============================================================================
+# AURA - AI Services (Disease Prediction & RAG Chatbot)
+# Production Dependencies
+# ==============================================================================
+
+# Core Scientific & Data Processing
+numpy==1.26.4
+pandas==2.2.2
+
+# Machine Learning & Imbalance Handling
+scikit-learn==1.4.2
+xgboost==2.0.3
+imbalanced-learn==0.12.2
+joblib==1.4.0
+
+# Visualization & Reporting
+matplotlib==3.8.4
+seaborn==0.13.2
+
+# API Server & Validation
+fastapi==0.110.1
+uvicorn==0.29.0
+pydantic==2.7.0
+python-multipart==0.0.9
+
+# Data Ingestion & Download Utilities
+requests==2.31.0
+kaggle==1.6.12
+
+# Optional NLP / RAG dependencies (for local vector search)
+sentence-transformers>=2.6.1
+chromadb>=0.4.24
