@@ -1,3 +1,53 @@
-
+# Environment
 .env
+.env.local
 backend/.env
+backend/aura/.env
+
+# Heavy data
+ai-services/datasets/raw/
+ai-services/datasets/processed/
+ai-services/datasets/*.zip
+ai-services/models/*.pkl
+ai-services/evaluation/plots/
+ai-services/evaluation/reports/
+ai-services/chatbot/knowledge_base/
+ai-services/chatbot/chroma_db/
+ai-services/chatbot/*.zip
+ai-services/chatbot/*.pkl
+ai-services/chatbot/venv/
+ai-services/chatbot/__pycache__/
+
+# Java crash logs
+hs_err_pid*.log
+replay_pid*.log
+backend/aura/hs_err_pid*.log
+backend/aura/replay_pid*.log
+
+# Node
+node_modules/
+.npm/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+venv/
+.venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Misc
+*.log
+*.tmp
