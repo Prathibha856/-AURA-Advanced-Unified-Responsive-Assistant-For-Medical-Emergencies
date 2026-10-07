@@ -22,7 +22,7 @@ def train_one(name):
 
 
 if __name__ == "__main__":
-    models = ["heart", "liver", "ckd"]
+    models = ["liver", "heart", "ckd"]
     results = []
     for name in models:
         r = train_one(name)
@@ -30,7 +30,7 @@ if __name__ == "__main__":
             results.append(r)
 
     print("\n" + "=" * 60)
-    print("MODULE 3 — CARDIOVASCULAR & KIDNEY SUMMARY")
+    print("MODULE 3 — CARDIO & KIDNEY SUMMARY")
     print("=" * 60)
     print(f"{'Model':25} {'Acc':>8} {'F1':>8} {'AUC':>8}")
     for r in results:

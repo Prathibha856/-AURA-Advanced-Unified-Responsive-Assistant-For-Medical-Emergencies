@@ -1,7 +1,5 @@
 ﻿"""
 modules/systemic_immune/train.py
-
-Training for Module 4: Systemic & Immune.
 """
 import sys
 from pathlib import Path
@@ -24,7 +22,7 @@ def train_one(name):
 
 
 if __name__ == "__main__":
-    models = ["vitamin_d"]
+    models = ["inflammation"]   # vitamin_d skipped — dataset is 98.4% negative
     results = []
     for name in models:
         r = train_one(name)
@@ -32,7 +30,7 @@ if __name__ == "__main__":
             results.append(r)
 
     print("\n" + "=" * 60)
-    print("MODULE 4 - SYSTEMIC & IMMUNE SUMMARY")
+    print("MODULE 4 — SYSTEMIC & IMMUNE SUMMARY")
     print("=" * 60)
     print(f"{'Model':25} {'Acc':>8} {'F1':>8} {'AUC':>8}")
     for r in results:

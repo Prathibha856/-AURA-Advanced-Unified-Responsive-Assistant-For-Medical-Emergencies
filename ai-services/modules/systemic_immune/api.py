@@ -1,6 +1,5 @@
 """
 modules/systemic_immune/api.py
-
 FastAPI router for Module 4 — Systemic & Immune.
 """
 import sys
@@ -16,6 +15,7 @@ SERVICES = HERE.parent.parent
 sys.path.insert(0, str(SERVICES))
 
 MODELS_DIR = HERE / "models"
+
 router = APIRouter(prefix="/systemic", tags=["Systemic & Immune"])
 
 _loaded = {}
@@ -60,7 +60,7 @@ def _predict(name, features):
     }
 
 
-class GenericRequest(BaseModel):
+class GenericReq(BaseModel):
     model_config = {"extra": "allow"}
 
 
@@ -69,11 +69,12 @@ def health():
     return {
         "module": "systemic_immune",
         "models_available": {
-            "vitamin_d": (MODELS_DIR / "vitamin_d_model.pkl").exists(),
+            "inflammation": (MODELS_DIR / "inflammation_model.pkl").exists(),
         },
     }
 
 
-@router.post("/predict/vitamin_d")
-def predict_vitamin_d(req: GenericRequest):
-    return _predict("vitamin_d", req.model_dump())
+@router.post("/inflammation")
+def predict_inflammation(req: GenericReq):
+    numeric = {k: float(v) for k, v in req.model_dump().items() if isinstance(v, (int, float))}
+    return _predict("inflammation", numeric)

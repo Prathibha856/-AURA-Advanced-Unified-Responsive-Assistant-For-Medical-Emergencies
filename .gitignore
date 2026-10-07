@@ -72,3 +72,6 @@ ai-services/**/models_export.zip
 # Backup files
 *.bak
 *.backup
+# Model export artifacts (not for repo)
+models_export.zip
+models_export/
