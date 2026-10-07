@@ -1,5 +1,7 @@
 ﻿"""
 modules/systemic_immune/train.py
+
+Training for Module 4: Systemic & Immune.
 """
 import sys
 from pathlib import Path
@@ -22,7 +24,7 @@ def train_one(name):
 
 
 if __name__ == "__main__":
-    models = ["vitamin_d"]  # inflammation disabled - CRP_ESR is not a real predictor
+    models = ["vitamin_d"]
     results = []
     for name in models:
         r = train_one(name)
