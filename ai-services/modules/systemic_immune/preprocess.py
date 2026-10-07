@@ -1,5 +1,7 @@
-﻿"""
+"""
 modules/systemic_immune/preprocess.py
+
+Preprocessing for Module 4: Systemic & Immune.
 """
 import sys
 from pathlib import Path
@@ -17,6 +19,7 @@ MODULE_DIR = HERE
 
 
 def process_vitamin_d():
+    """Vitamin D deficiency — binary from LBXVIDMS < 30 ng/mL."""
     path = DATA_DIR / "vitamin_d_clean.csv"
     if not path.exists():
         print(f"SKIP - {path} not found")
@@ -32,14 +35,10 @@ def process_vitamin_d():
     df["vitamin_d_deficient"] = (vals < 30).astype(int)
     print(f"  Target distribution:\n{df['vitamin_d_deficient'].value_counts()}")
 
-    leaky = [c for c in df.columns
-             if "LBXVIDMS" in c or c.startswith("VD") or "ONLY1FACTOR" in c]
-    print(f"  Dropping {len(leaky)} leaky columns")
-
     preprocess_pipeline(
         df,
         target_col="vitamin_d_deficient",
-        leaky_cols=leaky,
+        leaky_cols=["LBXVIDMS", "LBXVIDMS.1", "LBXVIDMS.CCCCC"],
         drop_cols=["SEQN"],
         model_name="vitamin_d",
         module_dir=MODULE_DIR,
@@ -47,6 +46,7 @@ def process_vitamin_d():
 
 
 def process_inflammation():
+    """Chronic Inflammation — binary from CRP_ESR."""
     path = DATA_DIR / "gastro_clean.csv"
     if not path.exists():
         print(f"SKIP - {path} not found")
@@ -59,6 +59,8 @@ def process_inflammation():
         return
 
     vals = df["CRP_ESR"]
+    print(f"  CRP_ESR dtype: {vals.dtype}")
+
     if vals.dtype == object:
         high_terms = ["high", "elevated", "abnormal", "positive"]
         df["inflammation"] = vals.astype(str).str.lower().apply(
@@ -83,4 +85,4 @@ def process_inflammation():
 if __name__ == "__main__":
     process_vitamin_d()
     process_inflammation()
-    print("\n[OK] Module 4 preprocessing done.")
+    print("\n[OK] Module 4 preprocessing done.")	

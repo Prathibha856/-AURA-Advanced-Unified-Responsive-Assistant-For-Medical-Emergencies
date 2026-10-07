@@ -54,3 +54,21 @@ desktop.ini
 # Chatbot data (available on GitHub Releases)
 ai-services/chatbot_data.zip
 ai-services/chatbot_data_export/
+
+
+
+# Module-trained models (each module has its own models folder)
+ai-services/modules/**/models/*.pkl
+ai-services/modules/**/data/*.csv
+ai-services/modules/**/reports/*.png
+ai-services/modules/**/__pycache__/
+ai-services/modules/**/*.pyc
+ai-services/modules/shared/*.csv
+
+# Models export zip (shared via GitHub Releases)
+ai-services/models_export.zip
+ai-services/**/models_export.zip
+
+# Backup files
+*.bak
+*.backup
