@@ -1,37 +1,40 @@
 """
-modules/systemic_immune/train.py
+modules/systemic_immune/preprocess.py
+Module 4: Systemic & Immune
 """
 import sys
 from pathlib import Path
+import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 SERVICES = HERE.parent.parent
 sys.path.insert(0, str(SERVICES))
 
-from modules.shared.training import train_from_processed_csvs
+from modules.shared.preprocessing import preprocess_pipeline
 
+DATA_DIR = HERE / "data"
 MODULE_DIR = HERE
 
 
-def train_one(name):
-    try:
-        return train_from_processed_csvs(name, MODULE_DIR)
-    except Exception as e:
-        print(f"FAILED {name}: {e}")
-        return None
+def process_inflammation():
+    path = DATA_DIR / "gastro_clean.csv"
+    if not path.exists():
+        print("SKIP - " + str(path) + " not found")
+        return
+    df = pd.read_csv(path)
+    print("\n=== Chronic Inflammation ===")
+    print("Columns: " + str(list(df.columns)))
+    possible_targets = ["target", "Target", "Diagnosis", "diagnosis", "Class", "class", "Disease_Class"]
+    target = next((c for c in df.columns if c in possible_targets), df.columns[-1])
+    print("Using target: " + target)
+    preprocess_pipeline(
+        df,
+        target_col=target,
+        model_name="inflammation",
+        module_dir=MODULE_DIR,
+    )
 
 
 if __name__ == "__main__":
-    models = ["inflammation"]  # vitamin_d skipped — broken dataset
-    results = []
-    for name in models:
-        r = train_one(name)
-        if r:
-            results.append(r)
-
-    print("\n" + "=" * 60)
-    print("MODULE 4 — SYSTEMIC & IMMUNE SUMMARY")
-    print("=" * 60)
-    print(f"{'Model':25} {'Acc':>8} {'F1':>8} {'AUC':>8}")
-    for r in results:
-        print(f"{r['model']:25} {r['test_accuracy']:>8.4f} {r['test_f1_weighted']:>8.4f} {r['test_roc_auc']:>8.4f}")
+    process_inflammation()
+    print("\n[OK] Module 4 preprocessing done.")
