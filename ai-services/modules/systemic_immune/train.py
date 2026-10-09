@@ -22,7 +22,7 @@ def train_one(name):
 
 
 if __name__ == "__main__":
-    models = ["inflammation"]   # vitamin_d skipped — dataset is 98.4% negative
+        models = []   # Module 4: no suitable dataset available
     results = []
     for name in models:
         r = train_one(name)

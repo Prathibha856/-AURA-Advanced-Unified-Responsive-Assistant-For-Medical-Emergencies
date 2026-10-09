@@ -76,5 +76,7 @@ def health():
 
 @router.post("/inflammation")
 def predict_inflammation(req: GenericReq):
-    numeric = {k: float(v) for k, v in req.model_dump().items() if isinstance(v, (int, float))}
-    return _predict("inflammation", numeric)
+    raise HTTPException(
+        status_code=503,
+        detail="Inflammation model not available — target column contained symptom categories, not disease labels. See RESULTS.md for details.",
+    )
