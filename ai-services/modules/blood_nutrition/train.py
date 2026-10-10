@@ -1,8 +1,3 @@
-"""
-modules/blood_nutrition/train.py
-
-Train Soft Voting Classifiers for Module 1: Blood & Nutritional Disorders.
-"""
 import sys
 from pathlib import Path
 
@@ -19,11 +14,11 @@ def train_one(name):
     try:
         return train_from_processed_csvs(name, MODULE_DIR)
     except Exception as e:
-        print(f"FAILED {name}: {e}")
+        print("FAILED " + name + ": " + str(e))
         return None
 
 
-if __name__ == "__main__":
+def main():
     models = ["anemia_kaggle", "anemia_mendeley", "vitamin_deficiency"]
     results = []
     for name in models:
@@ -32,8 +27,15 @@ if __name__ == "__main__":
             results.append(r)
 
     print("\n" + "=" * 60)
-    print("MODULE 1 — BLOOD & NUTRITION SUMMARY")
+    print("MODULE 1 - BLOOD & NUTRITION SUMMARY")
     print("=" * 60)
-    print(f"{'Model':25} {'Acc':>8} {'F1':>8} {'AUC':>8}")
+    print("{:25} {:>8} {:>8} {:>8}".format("Model", "Acc", "F1", "AUC"))
     for r in results:
-        print(f"{r['model']:25} {r['test_accuracy']:>8.4f} {r['test_f1_weighted']:>8.4f} {r['test_roc_auc']:>8.4f}")
+        print("{:25} {:>8.4f} {:>8.4f} {:>8.4f}".format(
+            r["model"], r["test_accuracy"],
+            r["test_f1_weighted"], r["test_roc_auc"]
+        ))
+
+
+if __name__ == "__main__":
+    main()
