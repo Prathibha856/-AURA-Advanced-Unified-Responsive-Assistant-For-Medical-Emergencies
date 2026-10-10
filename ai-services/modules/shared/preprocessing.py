@@ -2,8 +2,11 @@
 modules/shared/preprocessing.py
 
 Universal preprocessing utilities for all 4 AURA disease modules.
+Anti-leakage: split BEFORE fit, drop label-defining columns.
+Now saves feature names alongside models for interpretability.
 """
 import sys
+import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -63,6 +66,8 @@ def preprocess_pipeline(
     X = X.replace([np.inf, -np.inf], np.nan)
     print(f"  Features: {X.shape[1]}")
 
+    feature_names = list(X.columns)
+
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state, stratify=y
     )
@@ -88,21 +93,32 @@ def preprocess_pipeline(
 
     print(f"  X_train: {X_train.shape}, X_test: {X_test.shape}")
 
-    pd.DataFrame(X_train).to_csv(data_dir / f"{model_name}_X_train.csv", index=False)
-    pd.DataFrame(X_test).to_csv(data_dir / f"{model_name}_X_test.csv", index=False)
+    # Save splits WITH feature names as headers (so model is interpretable)
+    pd.DataFrame(X_train, columns=feature_names).to_csv(
+        data_dir / f"{model_name}_X_train.csv", index=False
+    )
+    pd.DataFrame(X_test, columns=feature_names).to_csv(
+        data_dir / f"{model_name}_X_test.csv", index=False
+    )
     pd.Series(y_train).to_csv(data_dir / f"{model_name}_y_train.csv", index=False)
     pd.Series(y_test).to_csv(data_dir / f"{model_name}_y_test.csv", index=False)
 
+    # Save preprocessors
     joblib.dump(scaler, models_dir / f"{model_name}_scaler.pkl")
     joblib.dump(imputer, models_dir / f"{model_name}_imputer.pkl")
 
-    print(f"  [OK] Saved {model_name} splits + scaler + imputer")
+    # Save feature names JSON — for interpretability
+    with open(models_dir / f"{model_name}_features.json", "w") as f:
+        json.dump(feature_names, f, indent=2)
+
+    print(f"  [OK] Saved {model_name} splits + scaler + imputer + features.json")
+    print(f"  Features ({len(feature_names)}): {feature_names}")
 
     return {
         "X_train_shape": X_train.shape,
         "X_test_shape": X_test.shape,
         "n_features": X.shape[1],
-        "feature_names": list(X.columns),
+        "feature_names": feature_names,
     }
 
 
