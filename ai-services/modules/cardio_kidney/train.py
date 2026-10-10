@@ -17,12 +17,12 @@ def train_one(name):
     try:
         return train_from_processed_csvs(name, MODULE_DIR)
     except Exception as e:
-        print(f"FAILED {name}: {e}")
+        print("FAILED " + name + ": " + str(e))
         return None
 
 
-if __name__ == "__main__":
-    models = ["liver", "heart", "ckd"]
+def main():
+    models = ["liver", "heart", "ckd", "dyslipidemia"]
     results = []
     for name in models:
         r = train_one(name)
@@ -30,8 +30,15 @@ if __name__ == "__main__":
             results.append(r)
 
     print("\n" + "=" * 60)
-    print("MODULE 3 — CARDIO & KIDNEY SUMMARY")
+    print("MODULE 3 - CARDIO & KIDNEY SUMMARY")
     print("=" * 60)
-    print(f"{'Model':25} {'Acc':>8} {'F1':>8} {'AUC':>8}")
+    print("{:25} {:>8} {:>8} {:>8}".format("Model", "Acc", "F1", "AUC"))
     for r in results:
-        print(f"{r['model']:25} {r['test_accuracy']:>8.4f} {r['test_f1_weighted']:>8.4f} {r['test_roc_auc']:>8.4f}")
+        print("{:25} {:>8.4f} {:>8.4f} {:>8.4f}".format(
+            r["model"], r["test_accuracy"],
+            r["test_f1_weighted"], r["test_roc_auc"]
+        ))
+
+
+if __name__ == "__main__":
+    main()

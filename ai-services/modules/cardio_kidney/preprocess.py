@@ -1,7 +1,6 @@
 """
 modules/cardio_kidney/preprocess.py
-
-Preprocessing for Module 3: Cardiovascular & Kidney.
+Module 3: Cardiovascular & Kidney
 """
 import sys
 from pathlib import Path
@@ -20,10 +19,10 @@ MODULE_DIR = HERE
 def process_liver():
     path = DATA_DIR / "liver_clean.csv"
     if not path.exists():
-        print(f"SKIP — {path} not found")
+        print("SKIP - " + str(path) + " not found")
         return
     df = pd.read_csv(path)
-    print(f"\n=== Liver ===")
+    print("\n=== Liver ===")
     preprocess_pipeline(
         df,
         target_col="Dataset",
@@ -35,10 +34,10 @@ def process_liver():
 def process_heart():
     path = DATA_DIR / "heart_clean.csv"
     if not path.exists():
-        print(f"SKIP — {path} not found")
+        print("SKIP - " + str(path) + " not found")
         return
     df = pd.read_csv(path)
-    print(f"\n=== Heart ===")
+    print("\n=== Heart ===")
     preprocess_pipeline(
         df,
         target_col="target",
@@ -51,19 +50,32 @@ def process_heart():
 def process_ckd():
     path = DATA_DIR / "ckd_clean.csv"
     if not path.exists():
-        print(f"SKIP — {path} not found (ARFF parse may have failed)")
+        print("SKIP - " + str(path) + " not found")
         return
     df = pd.read_csv(path)
-    print(f"\n=== CKD ===")
-    print(f"Columns: {list(df.columns)}")
-    possible_targets = ["class", "classification", "Target", "target"]
-    target = next((c for c in df.columns if c in possible_targets), df.columns[-1])
-    print(f"Using target: {target}")
+    print("\n=== CKD ===")
     preprocess_pipeline(
         df,
-        target_col=target,
+        target_col="class",
         leaky_cols=["sc", "bu", "bgr", "rbcc", "wbcc"],
         model_name="ckd",
+        module_dir=MODULE_DIR,
+    )
+
+
+def process_dyslipidemia():
+    path = DATA_DIR / "dyslipidemia_clean.csv"
+    if not path.exists():
+        print("SKIP - " + str(path) + " not found")
+        return
+    df = pd.read_csv(path)
+    print("\n=== Dyslipidemia ===")
+    preprocess_pipeline(
+        df,
+        target_col="dyslipidemia",
+        leaky_cols=["LBDLDL", "LBDLDLM", "LBDLDLN", "LBDLDLSI", "LBDLDMSI", "LBDLDNSI"],
+        drop_cols=["SEQN"],
+        model_name="dyslipidemia",
         module_dir=MODULE_DIR,
     )
 
@@ -72,4 +84,5 @@ if __name__ == "__main__":
     process_liver()
     process_heart()
     process_ckd()
+    process_dyslipidemia()
     print("\n[OK] Module 3 preprocessing done.")

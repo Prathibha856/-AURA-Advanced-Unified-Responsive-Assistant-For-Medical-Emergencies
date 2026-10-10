@@ -1,6 +1,7 @@
 """
 modules/systemic_immune/preprocess.py
-Module 4: Systemic & Immune - Chronic Inflammation
+
+Chronic Inflammation: binary target from CRP_ESR > 5 mg/L threshold.
 """
 import sys
 from pathlib import Path
@@ -23,33 +24,24 @@ def process_inflammation():
         return
     df = pd.read_csv(path)
     print("\n=== Chronic Inflammation ===")
-    print("Columns: " + str(list(df.columns)))
 
-    # Use Autoimmune_Disorders as the target (binary chronic inflammation marker)
-    target = "Autoimmune_Disorders"
-    if target not in df.columns:
-        print("Target 'Autoimmune_Disorders' not found. Using H_Pylori_Status.")
-        target = "H_Pylori_Status"
-    if target not in df.columns:
-        print("No suitable target found. Columns: " + str(list(df.columns)))
+    if "CRP_ESR" not in df.columns:
+        print("CRP_ESR column missing. Cannot process.")
         return
 
-    print("Using target: " + target)
+    crp = pd.to_numeric(df["CRP_ESR"], errors="coerce")
+    print("CRP_ESR stats: min=%.2f, max=%.2f, mean=%.2f" % (crp.min(), crp.max(), crp.mean()))
 
-    # These columns directly encode the target — drop as leakage
-    leaky = []
-    if target == "Autoimmune_Disorders":
-        # Autoimmune_Disorders may correlate with genetics/family history
-        leaky = ["Family_History", "Genetic_Markers"]
-    elif target == "H_Pylori_Status":
-        leaky = ["Stool_Culture", "Endoscopy_Result"]
+    df["elevated_inflammation"] = (crp > 5).astype(int)
+    df = df.dropna(subset=["elevated_inflammation"])
 
-    print("Leaky columns to drop: " + str(leaky))
+    print("Target distribution:")
+    print(df["elevated_inflammation"].value_counts())
 
     preprocess_pipeline(
         df,
-        target_col=target,
-        leaky_cols=leaky,
+        target_col="elevated_inflammation",
+        leaky_cols=["CRP_ESR"],
         model_name="inflammation",
         module_dir=MODULE_DIR,
     )
